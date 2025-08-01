@@ -1,0 +1,328 @@
+name: "천지인 플러스"
+identifier: "cheonjiin-plus"
+config:
+  orderMode: "sequential"
+  commitUnit: "explicitCommit"
+  displayMode: "modernMultiple"
+  supportStandaloneCluster: true
+layout:
+  # 모음
+  "1": { identifier: "ㅣ", label: "ㅣ" }
+  "2": { identifier: "ㆍ", label: "ㆍ" }
+  "3": { identifier: "ㅡ", label: "ㅡ" }
+  
+  # 자음
+  q: { identifier: "ㄱ", label: "ㄱ" }
+  w: { identifier: "ㅋ", label: "ㅋ" }
+  e: { identifier: "ㄴ", label: "ㄴ" }
+  r: { identifier: "ㄹ", label: "ㄹ" }
+  t: { identifier: "ㄷ", label: "ㄷ" }
+  y: { identifier: "ㅌ", label: "ㅌ" }
+  a: { identifier: "ㅂ", label: "ㅂ" }
+  s: { identifier: "ㅍ", label: "ㅍ" }
+  d: { identifier: "ㅅ", label: "ㅅ" }
+  f: { identifier: "ㅎ", label: "ㅎ" }
+  g: { identifier: "ㅈ", label: "ㅈ" }
+  h: { identifier: "ㅊ", label: "ㅊ" }
+  c: { identifier: "ㅇ", label: "ㅇ" }
+  v: { identifier: "ㅁ", label: "ㅁ" }
+  
+  # 특수문자
+  b: { identifier: ".,", label: ".,", isNonKorean: true }
+  n: { identifier: "?!", label: "?!", isNonKorean: true }
+
+automata:
+  choseong:
+    transitions:
+      # 기본 자음
+      - { from: "", input: "ㄱ", to: "ㄱ" }
+      - { from: "", input: "ㅋ", to: "ㅋ" }
+      - { from: "", input: "ㄴ", to: "ㄴ" }
+      - { from: "", input: "ㄹ", to: "ㄹ" }
+      - { from: "", input: "ㄷ", to: "ㄷ" }
+      - { from: "", input: "ㅌ", to: "ㅌ" }
+      - { from: "", input: "ㅂ", to: "ㅂ" }
+      - { from: "", input: "ㅍ", to: "ㅍ" }
+      - { from: "", input: "ㅅ", to: "ㅅ" }
+      - { from: "", input: "ㅎ", to: "ㅎ" }
+      - { from: "", input: "ㅈ", to: "ㅈ" }
+      - { from: "", input: "ㅊ", to: "ㅊ" }
+      - { from: "", input: "ㅇ", to: "ㅇ" }
+      - { from: "", input: "ㅁ", to: "ㅁ" }
+      
+      # ㅋ + ㅋ = ㄲ
+      - { from: "ㅋ", input: "ㅋ", to: "ㄲ" }
+      # ㅌ + ㅌ = ㄸ
+      - { from: "ㅌ", input: "ㅌ", to: "ㄸ" }
+      # ㅍ + ㅍ = ㅃ
+      - { from: "ㅍ", input: "ㅍ", to: "ㅃ" }
+      # ㅎ + ㅎ = ㅆ
+      - { from: "ㅎ", input: "ㅎ", to: "ㅆ" }
+      # ㅊ + ㅊ = ㅉ
+      - { from: "ㅊ", input: "ㅊ", to: "ㅉ" }
+    
+    display:
+      "ㄱ": "\u1100"  # ᄀ
+      "ㄲ": "\u1101"  # ᄁ
+      "ㄴ": "\u1102"  # ᄂ
+      "ㄷ": "\u1103"  # ᄃ
+      "ㄸ": "\u1104"  # ᄄ
+      "ㄹ": "\u1105"  # ᄅ
+      "ㅁ": "\u1106"  # ᄆ
+      "ㅂ": "\u1107"  # ᄇ
+      "ㅃ": "\u1108"  # ᄈ
+      "ㅅ": "\u1109"  # ᄉ
+      "ㅆ": "\u110A"  # ᄊ
+      "ㅇ": "\u110B"  # ᄋ
+      "ㅈ": "\u110C"  # ᄌ
+      "ㅉ": "\u110D"  # ᄍ
+      "ㅊ": "\u110E"  # ᄎ
+      "ㅋ": "\u110F"  # ᄏ
+      "ㅌ": "\u1110"  # ᄐ
+      "ㅍ": "\u1111"  # ᄑ
+      "ㅎ": "\u1112"  # ᄒ
+  
+  jungseong:
+    transitions:
+      # 기본 모음
+      - { from: "", input: "ㅣ", to: "ㅣ" }
+      - { from: "", input: "ㆍ", to: "ㆍ" }
+      - { from: "", input: "ㅡ", to: "ㅡ" }
+      
+      # ㆍ + ㆍ = ᆢ (쌍아래아)
+      - { from: "ㆍ", input: "ㆍ", to: "ᆢ" }
+      
+      # ㅣ + ㆍ = ㅏ
+      - { from: "ㅣ", input: "ㆍ", to: "ㅏ" }
+      # ㅏ + ㆍ = ㅑ
+      - { from: "ㅏ", input: "ㆍ", to: "ㅑ" }
+      
+      # ㆍ + ㅣ = ㅓ
+      - { from: "ㆍ", input: "ㅣ", to: "ㅓ" }
+      # ᆢ + ㅣ = ㅕ
+      - { from: "ᆢ", input: "ㅣ", to: "ㅕ" }
+      
+      # ㆍ + ㅡ = ㅗ
+      - { from: "ㆍ", input: "ㅡ", to: "ㅗ" }
+      # ᆢ + ㅡ = ㅛ
+      - { from: "ᆢ", input: "ㅡ", to: "ㅛ" }
+      
+      # ㅡ + ㆍ = ㅜ
+      - { from: "ㅡ", input: "ㆍ", to: "ㅜ" }
+      # ㅜ + ㆍ = ㅠ
+      - { from: "ㅜ", input: "ㆍ", to: "ㅠ" }
+      
+      # 복모음
+      # ㅏ + ㅣ = ㅐ
+      - { from: "ㅏ", input: "ㅣ", to: "ㅐ" }
+      # ㅑ + ㅣ = ㅒ
+      - { from: "ㅑ", input: "ㅣ", to: "ㅒ" }
+      # ㅓ + ㅣ = ㅔ
+      - { from: "ㅓ", input: "ㅣ", to: "ㅔ" }
+      # ㅕ + ㅣ = ㅖ
+      - { from: "ㅕ", input: "ㅣ", to: "ㅖ" }
+      
+      # ㅗ + ㅣ = ㅚ
+      - { from: "ㅗ", input: "ㅣ", to: "ㅚ" }
+      # ㅚ + ㆍ = ㅘ
+      - { from: "ㅚ", input: "ㆍ", to: "ㅘ" }
+      # ㅘ + ㅣ = ㅙ
+      - { from: "ㅘ", input: "ㅣ", to: "ㅙ" }
+      
+      # ㅠ + ㅣ = ㅝ
+      - { from: "ㅠ", input: "ㅣ", to: "ㅝ" }
+      # ㅝ + ㅣ = ㅞ
+      - { from: "ㅝ", input: "ㅣ", to: "ㅞ" }
+      # ㅜ + ㅣ = ㅟ
+      - { from: "ㅜ", input: "ㅣ", to: "ㅟ" }
+      # ㅡ + ㅣ = ㅢ
+      - { from: "ㅡ", input: "ㅣ", to: "ㅢ" }
+    
+    display:
+      "ㅣ": "\u1175"  # ᅵ
+      "ㆍ": "\u119E"  # ᆞ
+      "ᆢ": "\u11A2"  # ᆢ
+      "ㅡ": "\u1173"  # ᅳ
+      "ㅏ": "\u1161"  # ᅡ
+      "ㅑ": "\u1163"  # ᅣ
+      "ㅓ": "\u1165"  # ᅥ
+      "ㅕ": "\u1167"  # ᅧ
+      "ㅗ": "\u1169"  # ᅩ
+      "ㅛ": "\u116D"  # ᅭ
+      "ㅜ": "\u116E"  # ᅮ
+      "ㅠ": "\u1172"  # ᅲ
+      "ㅐ": "\u1162"  # ᅢ
+      "ㅒ": "\u1164"  # ᅤ
+      "ㅔ": "\u1166"  # ᅦ
+      "ㅖ": "\u1168"  # ᅨ
+      "ㅚ": "\u116C"  # ᅬ
+      "ㅘ": "\u116A"  # ᅪ
+      "ㅙ": "\u116B"  # ᅫ
+      "ㅝ": "\u116F"  # ᅯ
+      "ㅞ": "\u1170"  # ᅰ
+      "ㅟ": "\u1171"  # ᅱ
+      "ㅢ": "\u1174"  # ᅴ
+  
+  jongseong:
+    transitions:
+      # Base consonants
+      - { from: "", input: "ㄱ", to: "ㄱ" }
+      - { from: "", input: "ㅋ", to: "ㅋ" }
+      - { from: "", input: "ㄴ", to: "ㄴ" }
+      - { from: "", input: "ㄹ", to: "ㄹ" }
+      - { from: "", input: "ㄷ", to: "ㄷ" }
+      - { from: "", input: "ㅌ", to: "ㅌ" }
+      - { from: "", input: "ㅂ", to: "ㅂ" }
+      - { from: "", input: "ㅍ", to: "ㅍ" }
+      - { from: "", input: "ㅅ", to: "ㅅ" }
+      - { from: "", input: "ㅎ", to: "ㅎ" }
+      - { from: "", input: "ㅈ", to: "ㅈ" }
+      - { from: "", input: "ㅊ", to: "ㅊ" }
+      - { from: "", input: "ㅇ", to: "ㅇ" }
+      - { from: "", input: "ㅁ", to: "ㅁ" }
+      
+      # 쌍자음 조합 (종성에는 ㄲ 와 ㅆ 만 들어갈 수 있음)
+      # ㅋ + ㅋ = ㄲ
+      - { from: "ㅋ", input: "ㅋ", to: "ㄲ" }
+      # ㅎ + ㅎ = ㅆ
+      - { from: "ㅎ", input: "ㅎ", to: "ㅆ" }
+      
+      # 겹자음
+      # ㄱ + ㅅ = ㄳ
+      - { from: "ㄱ", input: "ㅅ", to: "ㄳ" }
+      # ㄴ + ㅈ = ㄵ
+      - { from: "ㄴ", input: "ㅈ", to: "ㄵ" }
+      # ㄴ + ㅎ = ㄶ
+      - { from: "ㄴ", input: "ㅎ", to: "ㄶ" }
+      # ㄹ + ㄱ = ㄺ
+      - { from: "ㄹ", input: "ㄱ", to: "ㄺ" }
+      # ㄹ + ㅁ = ㄻ
+      - { from: "ㄹ", input: "ㅁ", to: "ㄻ" }
+      # ㄹ + ㅂ = ㄼ
+      - { from: "ㄹ", input: "ㅂ", to: "ㄼ" }
+      # ㄹ + ㅅ = ㄽ
+      - { from: "ㄹ", input: "ㅅ", to: "ㄽ" }
+      # ㄹ + ㅌ = ㄾ
+      - { from: "ㄹ", input: "ㅌ", to: "ㄾ" }
+      # ㄹ + ㅍ = ㄿ
+      - { from: "ㄹ", input: "ㅍ", to: "ㄿ" }
+      # ㄹ + ㅎ = ㅀ
+      - { from: "ㄹ", input: "ㅎ", to: "ㅀ" }
+      # ㅂ + ㅅ = ㅄ
+      - { from: "ㅂ", input: "ㅅ", to: "ㅄ" }
+    
+    display:
+      "ㄱ": "\u11A8"  # ᆨ
+      "ㄲ": "\u11A9"  # ᆩ
+      "ㄳ": "\u11AA"  # ᆪ
+      "ㄴ": "\u11AB"  # ᆫ
+      "ㄵ": "\u11AC"  # ᆬ
+      "ㄶ": "\u11AD"  # ᆭ
+      "ㄷ": "\u11AE"  # ᆮ
+      "ㄹ": "\u11AF"  # ᆯ
+      "ㄺ": "\u11B0"  # ᆰ
+      "ㄻ": "\u11B1"  # ᆱ
+      "ㄼ": "\u11B2"  # ᆲ
+      "ㄽ": "\u11B3"  # ᆳ
+      "ㄾ": "\u11B4"  # ᆴ
+      "ㄿ": "\u11B5"  # ᆵ
+      "ㅀ": "\u11B6"  # ᆶ
+      "ㅁ": "\u11B7"  # ᆷ
+      "ㅂ": "\u11B8"  # ᆸ
+      "ㅄ": "\u11B9"  # ᆹ
+      "ㅅ": "\u11BA"  # ᆺ
+      "ㅆ": "\u11BB"  # ᆻ
+      "ㅇ": "\u11BC"  # ᆼ
+      "ㅈ": "\u11BD"  # ᆽ
+      "ㅊ": "\u11BE"  # ᆾ
+      "ㅋ": "\u11BF"  # ᆿ
+      "ㅌ": "\u11C0"  # ᇀ
+      "ㅍ": "\u11C1"  # ᇁ
+      "ㅎ": "\u11C2"  # ᇂ
+  
+  dokkaebibul:
+    transitions:
+      # 일반 도깨비 분리
+      - { jongseong: "ㄳ", remaining: "ㄱ", moved: "ㅅ" }
+      - { jongseong: "ㄵ", remaining: "ㄴ", moved: "ㅈ" }
+      - { jongseong: "ㄶ", remaining: "ㄴ", moved: "ㅎ" }
+      - { jongseong: "ㄺ", remaining: "ㄹ", moved: "ㄱ" }
+      - { jongseong: "ㄻ", remaining: "ㄹ", moved: "ㅁ" }
+      - { jongseong: "ㄼ", remaining: "ㄹ", moved: "ㅂ" }
+      - { jongseong: "ㄽ", remaining: "ㄹ", moved: "ㅅ" }
+      - { jongseong: "ㄾ", remaining: "ㄹ", moved: "ㅌ" }
+      - { jongseong: "ㄿ", remaining: "ㄹ", moved: "ㅍ" }
+      - { jongseong: "ㅀ", remaining: "ㄹ", moved: "ㅎ" }
+      - { jongseong: "ㅄ", remaining: "ㅂ", moved: "ㅅ" }
+      
+      # 단자음 및 쌍자음은 분리되지 않음
+      - { jongseong: "ㄱ", remaining: null, moved: "ㄱ" }
+      - { jongseong: "ㄴ", remaining: null, moved: "ㄴ" }
+      - { jongseong: "ㄷ", remaining: null, moved: "ㄷ" }
+      - { jongseong: "ㄹ", remaining: null, moved: "ㄹ" }
+      - { jongseong: "ㅁ", remaining: null, moved: "ㅁ" }
+      - { jongseong: "ㅂ", remaining: null, moved: "ㅂ" }
+      - { jongseong: "ㅅ", remaining: null, moved: "ㅅ" }
+      - { jongseong: "ㅇ", remaining: null, moved: "ㅇ" }
+      - { jongseong: "ㅈ", remaining: null, moved: "ㅈ" }
+      - { jongseong: "ㅊ", remaining: null, moved: "ㅊ" }
+      - { jongseong: "ㅋ", remaining: null, moved: "ㅋ" }
+      - { jongseong: "ㅌ", remaining: null, moved: "ㅌ" }
+      - { jongseong: "ㅍ", remaining: null, moved: "ㅍ" }
+      - { jongseong: "ㅎ", remaining: null, moved: "ㅎ" }
+      - { jongseong: "ㄲ", remaining: null, moved: "ㄲ" }
+      - { jongseong: "ㅆ", remaining: null, moved: "ㅆ" }
+  
+  backspace:
+    transitions:
+      # 중성 백스페이스 - 표준 천지인과 동일함
+      - { from: "ᆢ", to: "ㆍ" }
+      - { from: "ㅏ", to: "ㅣ" }
+      - { from: "ㅑ", to: "ㅏ" }
+      - { from: "ㅓ", to: "ㆍ" }
+      - { from: "ㅕ", to: "ᆢ" }
+      - { from: "ㅗ", to: "ㆍ" }
+      - { from: "ㅛ", to: "ᆢ" }
+      - { from: "ㅜ", to: "ㅡ" }
+      - { from: "ㅠ", to: "ㅜ" }
+      - { from: "ㅐ", to: "ㅏ" }
+      - { from: "ㅒ", to: "ㅑ" }
+      - { from: "ㅔ", to: "ㅓ" }
+      - { from: "ㅖ", to: "ㅕ" }
+      - { from: "ㅚ", to: "ㅗ" }
+      - { from: "ㅘ", to: "ㅚ" }
+      - { from: "ㅙ", to: "ㅘ" }
+      - { from: "ㅝ", to: "ㅠ" }
+      - { from: "ㅞ", to: "ㅝ" }
+      - { from: "ㅟ", to: "ㅜ" }
+      - { from: "ㅢ", to: "ㅡ" }
+      
+      # 종성 백스페이스
+      - { from: "ㄳ", to: "ㄱ" }
+      - { from: "ㄵ", to: "ㄴ" }
+      - { from: "ㄶ", to: "ㄴ" }
+      - { from: "ㄺ", to: "ㄹ" }
+      - { from: "ㄻ", to: "ㄹ" }
+      - { from: "ㄼ", to: "ㄹ" }
+      - { from: "ㄽ", to: "ㄹ" }
+      - { from: "ㄾ", to: "ㄹ" }
+      - { from: "ㄿ", to: "ㄹ" }
+      - { from: "ㅀ", to: "ㄹ" }
+      - { from: "ㅄ", to: "ㅂ" }
+  
+  specialCharacter:
+    transitions:
+      # 기본 변환
+      - { from: "", input: ".,", to: "." }
+      - { from: "", input: "?!", to: "?" }
+      
+      # . + . = ,
+      - { from: ".", input: ".,", to: "," }
+      # ? + ? = !
+      - { from: "?", input: "?!", to: "!" }
+    
+    display:
+      ".": "."
+      "?": "?"
+      ",": ","
+      "!": "!"

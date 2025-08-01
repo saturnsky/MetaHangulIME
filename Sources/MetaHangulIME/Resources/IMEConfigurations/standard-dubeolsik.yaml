@@ -1,0 +1,252 @@
+# 표준 두벌식 IME 설정
+name: "표준 두벌식"
+identifier: "standard-dubeolsik"
+
+config:
+  orderMode: "sequential"
+  commitUnit: "syllable"
+  displayMode: "modernMultiple"
+  supportStandaloneCluster: false
+
+layout:
+  # 자음
+  r: { identifier: "ㄱ", label: "ㄱ" }
+  R: { identifier: "ㄲ", label: "ㄲ" }
+  s: { identifier: "ㄴ", label: "ㄴ" }
+  e: { identifier: "ㄷ", label: "ㄷ" }
+  E: { identifier: "ㄸ", label: "ㄸ" }
+  f: { identifier: "ㄹ", label: "ㄹ" }
+  a: { identifier: "ㅁ", label: "ㅁ" }
+  q: { identifier: "ㅂ", label: "ㅂ" }
+  Q: { identifier: "ㅃ", label: "ㅃ" }
+  t: { identifier: "ㅅ", label: "ㅅ" }
+  T: { identifier: "ㅆ", label: "ㅆ" }
+  d: { identifier: "ㅇ", label: "ㅇ" }
+  w: { identifier: "ㅈ", label: "ㅈ" }
+  W: { identifier: "ㅉ", label: "ㅉ" }
+  c: { identifier: "ㅊ", label: "ㅊ" }
+  z: { identifier: "ㅋ", label: "ㅋ" }
+  x: { identifier: "ㅌ", label: "ㅌ" }
+  v: { identifier: "ㅍ", label: "ㅍ" }
+  g: { identifier: "ㅎ", label: "ㅎ" }
+  
+  # 모음
+  k: { identifier: "ㅏ", label: "ㅏ" }
+  o: { identifier: "ㅐ", label: "ㅐ" }
+  i: { identifier: "ㅑ", label: "ㅑ" }
+  O: { identifier: "ㅒ", label: "ㅒ" }
+  j: { identifier: "ㅓ", label: "ㅓ" }
+  p: { identifier: "ㅔ", label: "ㅔ" }
+  u: { identifier: "ㅕ", label: "ㅕ" }
+  P: { identifier: "ㅖ", label: "ㅖ" }
+  h: { identifier: "ㅗ", label: "ㅗ" }
+  y: { identifier: "ㅛ", label: "ㅛ" }
+  n: { identifier: "ㅜ", label: "ㅜ" }
+  b: { identifier: "ㅠ", label: "ㅠ" }
+  m: { identifier: "ㅡ", label: "ㅡ" }
+  l: { identifier: "ㅣ", label: "ㅣ" }
+
+automata:
+  choseong:
+    transitions:
+      # 모든 자음은 단일 전이만 가짐
+      - { from: "", input: "ㄱ", to: "ㄱ" }
+      - { from: "", input: "ㄲ", to: "ㄲ" }
+      - { from: "", input: "ㄴ", to: "ㄴ" }
+      - { from: "", input: "ㄷ", to: "ㄷ" }
+      - { from: "", input: "ㄸ", to: "ㄸ" }
+      - { from: "", input: "ㄹ", to: "ㄹ" }
+      - { from: "", input: "ㅁ", to: "ㅁ" }
+      - { from: "", input: "ㅂ", to: "ㅂ" }
+      - { from: "", input: "ㅃ", to: "ㅃ" }
+      - { from: "", input: "ㅅ", to: "ㅅ" }
+      - { from: "", input: "ㅆ", to: "ㅆ" }
+      - { from: "", input: "ㅇ", to: "ㅇ" }
+      - { from: "", input: "ㅈ", to: "ㅈ" }
+      - { from: "", input: "ㅉ", to: "ㅉ" }
+      - { from: "", input: "ㅊ", to: "ㅊ" }
+      - { from: "", input: "ㅋ", to: "ㅋ" }
+      - { from: "", input: "ㅌ", to: "ㅌ" }
+      - { from: "", input: "ㅍ", to: "ㅍ" }
+      - { from: "", input: "ㅎ", to: "ㅎ" }
+    
+    display:
+      "ㄱ": "\u1100"  # ᄀ
+      "ㄲ": "\u1101"  # ᄁ
+      "ㄴ": "\u1102"  # ᄂ
+      "ㄷ": "\u1103"  # ᄃ
+      "ㄸ": "\u1104"  # ᄄ
+      "ㄹ": "\u1105"  # ᄅ
+      "ㅁ": "\u1106"  # ᄆ
+      "ㅂ": "\u1107"  # ᄇ
+      "ㅃ": "\u1108"  # ᄈ
+      "ㅅ": "\u1109"  # ᄉ
+      "ㅆ": "\u110A"  # ᄊ
+      "ㅇ": "\u110B"  # ᄋ
+      "ㅈ": "\u110C"  # ᄌ
+      "ㅉ": "\u110D"  # ᄍ
+      "ㅊ": "\u110E"  # ᄎ
+      "ㅋ": "\u110F"  # ᄏ
+      "ㅌ": "\u1110"  # ᄐ
+      "ㅍ": "\u1111"  # ᄑ
+      "ㅎ": "\u1112"  # ᄒ
+  
+  jungseong:
+    transitions:
+      # 단일 모음
+      - { from: "", input: "ㅏ", to: "ㅏ" }
+      - { from: "", input: "ㅐ", to: "ㅐ" }
+      - { from: "", input: "ㅑ", to: "ㅑ" }
+      - { from: "", input: "ㅒ", to: "ㅒ" }
+      - { from: "", input: "ㅓ", to: "ㅓ" }
+      - { from: "", input: "ㅔ", to: "ㅔ" }
+      - { from: "", input: "ㅕ", to: "ㅕ" }
+      - { from: "", input: "ㅖ", to: "ㅖ" }
+      - { from: "", input: "ㅗ", to: "ㅗ" }
+      - { from: "", input: "ㅛ", to: "ㅛ" }
+      - { from: "", input: "ㅜ", to: "ㅜ" }
+      - { from: "", input: "ㅠ", to: "ㅠ" }
+      - { from: "", input: "ㅡ", to: "ㅡ" }
+      - { from: "", input: "ㅣ", to: "ㅣ" }
+      
+      # 복합 모음
+      - { from: "ㅗ", input: "ㅏ", to: "ㅘ" }
+      - { from: "ㅗ", input: "ㅐ", to: "ㅙ" }
+      - { from: "ㅗ", input: "ㅣ", to: "ㅚ" }
+      - { from: "ㅜ", input: "ㅓ", to: "ㅝ" }
+      - { from: "ㅜ", input: "ㅔ", to: "ㅞ" }
+      - { from: "ㅜ", input: "ㅣ", to: "ㅟ" }
+      - { from: "ㅡ", input: "ㅣ", to: "ㅢ" }
+    
+    display:
+      "ㅏ": "\u1161"  # ᅡ
+      "ㅐ": "\u1162"  # ᅢ
+      "ㅑ": "\u1163"  # ᅣ
+      "ㅒ": "\u1164"  # ᅤ
+      "ㅓ": "\u1165"  # ᅥ
+      "ㅔ": "\u1166"  # ᅦ
+      "ㅕ": "\u1167"  # ᅧ
+      "ㅖ": "\u1168"  # ᅨ
+      "ㅗ": "\u1169"  # ᅩ
+      "ㅘ": "\u116A"  # ᅪ
+      "ㅙ": "\u116B"  # ᅫ
+      "ㅚ": "\u116C"  # ᅬ
+      "ㅛ": "\u116D"  # ᅭ
+      "ㅜ": "\u116E"  # ᅮ
+      "ㅝ": "\u116F"  # ᅯ
+      "ㅞ": "\u1170"  # ᅰ
+      "ㅟ": "\u1171"  # ᅱ
+      "ㅠ": "\u1172"  # ᅲ
+      "ㅡ": "\u1173"  # ᅳ
+      "ㅢ": "\u1174"  # ᅴ
+      "ㅣ": "\u1175"  # ᅵ
+  
+  jongseong:
+    transitions:
+      # 단일 자음
+      - { from: "", input: "ㄱ", to: "ㄱ" }
+      - { from: "", input: "ㄲ", to: "ㄲ" }
+      - { from: "", input: "ㄴ", to: "ㄴ" }
+      - { from: "", input: "ㄷ", to: "ㄷ" }
+      - { from: "", input: "ㄹ", to: "ㄹ" }
+      - { from: "", input: "ㅁ", to: "ㅁ" }
+      - { from: "", input: "ㅂ", to: "ㅂ" }
+      - { from: "", input: "ㅅ", to: "ㅅ" }
+      - { from: "", input: "ㅆ", to: "ㅆ" }
+      - { from: "", input: "ㅇ", to: "ㅇ" }
+      - { from: "", input: "ㅈ", to: "ㅈ" }
+      - { from: "", input: "ㅊ", to: "ㅊ" }
+      - { from: "", input: "ㅋ", to: "ㅋ" }
+      - { from: "", input: "ㅌ", to: "ㅌ" }
+      - { from: "", input: "ㅍ", to: "ㅍ" }
+      - { from: "", input: "ㅎ", to: "ㅎ" }
+      
+      # 복합 자음
+      - { from: "ㄱ", input: "ㅅ", to: "ㄳ" }
+      - { from: "ㄴ", input: "ㅈ", to: "ㄵ" }
+      - { from: "ㄴ", input: "ㅎ", to: "ㄶ" }
+      - { from: "ㄹ", input: "ㄱ", to: "ㄺ" }
+      - { from: "ㄹ", input: "ㅁ", to: "ㄻ" }
+      - { from: "ㄹ", input: "ㅂ", to: "ㄼ" }
+      - { from: "ㄹ", input: "ㅅ", to: "ㄽ" }
+      - { from: "ㄹ", input: "ㅌ", to: "ㄾ" }
+      - { from: "ㄹ", input: "ㅍ", to: "ㄿ" }
+      - { from: "ㄹ", input: "ㅎ", to: "ㅀ" }
+      - { from: "ㅂ", input: "ㅅ", to: "ㅄ" }
+    
+    display:
+      "ㄱ": "\u11A8"  # ᆨ
+      "ㄲ": "\u11A9"  # ᆩ
+      "ㄳ": "\u11AA"  # ᆪ
+      "ㄴ": "\u11AB"  # ᆫ
+      "ㄵ": "\u11AC"  # ᆬ
+      "ㄶ": "\u11AD"  # ᆭ
+      "ㄷ": "\u11AE"  # ᆮ
+      "ㄹ": "\u11AF"  # ᆯ
+      "ㄺ": "\u11B0"  # ᆰ
+      "ㄻ": "\u11B1"  # ᆱ
+      "ㄼ": "\u11B2"  # ᆲ
+      "ㄽ": "\u11B3"  # ᆳ
+      "ㄾ": "\u11B4"  # ᆴ
+      "ㄿ": "\u11B5"  # ᆵ
+      "ㅀ": "\u11B6"  # ᆶ
+      "ㅁ": "\u11B7"  # ᆷ
+      "ㅂ": "\u11B8"  # ᆸ
+      "ㅄ": "\u11B9"  # ᆹ
+      "ㅅ": "\u11BA"  # ᆺ
+      "ㅆ": "\u11BB"  # ᆻ
+      "ㅇ": "\u11BC"  # ᆼ
+      "ㅈ": "\u11BD"  # ᆽ
+      "ㅊ": "\u11BE"  # ᆾ
+      "ㅋ": "\u11BF"  # ᆿ
+      "ㅌ": "\u11C0"  # ᇀ
+      "ㅍ": "\u11C1"  # ᇁ
+      "ㅎ": "\u11C2"  # ᇂ
+  
+  dokkaebibul:
+    transitions:
+      # 전체가 이동하는 단일 자음
+      - { jongseong: "ㄱ", remaining: null, moved: "ㄱ" }
+      - { jongseong: "ㄲ", remaining: null, moved: "ㄲ" }
+      - { jongseong: "ㄴ", remaining: null, moved: "ㄴ" }
+      - { jongseong: "ㄷ", remaining: null, moved: "ㄷ" }
+      - { jongseong: "ㄹ", remaining: null, moved: "ㄹ" }
+      - { jongseong: "ㅁ", remaining: null, moved: "ㅁ" }
+      - { jongseong: "ㅂ", remaining: null, moved: "ㅂ" }
+      - { jongseong: "ㅅ", remaining: null, moved: "ㅅ" }
+      - { jongseong: "ㅆ", remaining: null, moved: "ㅆ" }
+      - { jongseong: "ㅇ", remaining: null, moved: "ㅇ" }
+      - { jongseong: "ㅈ", remaining: null, moved: "ㅈ" }
+      - { jongseong: "ㅊ", remaining: null, moved: "ㅊ" }
+      - { jongseong: "ㅋ", remaining: null, moved: "ㅋ" }
+      - { jongseong: "ㅌ", remaining: null, moved: "ㅌ" }
+      - { jongseong: "ㅍ", remaining: null, moved: "ㅍ" }
+      - { jongseong: "ㅎ", remaining: null, moved: "ㅎ" }
+      
+      # 분할되는 복합 자음
+      - { jongseong: "ㄳ", remaining: "ㄱ", moved: "ㅅ" }
+      - { jongseong: "ㄵ", remaining: "ㄴ", moved: "ㅈ" }
+      - { jongseong: "ㄶ", remaining: "ㄴ", moved: "ㅎ" }
+      - { jongseong: "ㄺ", remaining: "ㄹ", moved: "ㄱ" }
+      - { jongseong: "ㄻ", remaining: "ㄹ", moved: "ㅁ" }
+      - { jongseong: "ㄼ", remaining: "ㄹ", moved: "ㅂ" }
+      - { jongseong: "ㄽ", remaining: "ㄹ", moved: "ㅅ" }
+      - { jongseong: "ㄾ", remaining: "ㄹ", moved: "ㅌ" }
+      - { jongseong: "ㄿ", remaining: "ㄹ", moved: "ㅍ" }
+      - { jongseong: "ㅀ", remaining: "ㄹ", moved: "ㅎ" }
+      - { jongseong: "ㅄ", remaining: "ㅂ", moved: "ㅅ" }
+  
+  backspace:
+    transitions:
+      # 종성 백스페이스
+      - { from: "ㄳ", to: "ㄱ" }
+      - { from: "ㄵ", to: "ㄴ" }
+      - { from: "ㄶ", to: "ㄴ" }
+      - { from: "ㄺ", to: "ㄹ" }
+      - { from: "ㄻ", to: "ㄹ" }
+      - { from: "ㄼ", to: "ㄹ" }
+      - { from: "ㄽ", to: "ㄹ" }
+      - { from: "ㄾ", to: "ㄹ" }
+      - { from: "ㄿ", to: "ㄹ" }
+      - { from: "ㅀ", to: "ㄹ" }
+      - { from: "ㅄ", to: "ㅂ" }
