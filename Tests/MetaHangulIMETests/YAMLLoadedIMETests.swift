@@ -430,7 +430,7 @@ extension YAMLLoadedIMETests {
           "1": { identifier: "ㅣ", label: "ㅣ" }
           "2": { identifier: "ㆍ", label: "ㆍ" }
           "3": { identifier: "ㅡ", label: "ㅡ" }
-          c: { identifier: ".", label: ".", isNonKorean: true }
+          c: { identifier: ".", label: ".", isNonJamo: true }
         automata:
           choseong:
             transitions:

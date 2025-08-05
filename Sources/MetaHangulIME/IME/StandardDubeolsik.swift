@@ -21,51 +21,51 @@ public final class StandardDubeolsik: KoreanIME {
     private static func createLayout() -> [String: VirtualKey] {
         return [
             // 일반 키
-            "1": VirtualKey(keyIdentifier: "1", label: "1", isNonKorean: true),
-            "2": VirtualKey(keyIdentifier: "2", label: "2", isNonKorean: true),
-            "3": VirtualKey(keyIdentifier: "3", label: "3", isNonKorean: true),
-            "4": VirtualKey(keyIdentifier: "4", label: "4", isNonKorean: true),
-            "5": VirtualKey(keyIdentifier: "5", label: "5", isNonKorean: true),
-            "6": VirtualKey(keyIdentifier: "6", label: "6", isNonKorean: true),
-            "7": VirtualKey(keyIdentifier: "7", label: "7", isNonKorean: true),
-            "8": VirtualKey(keyIdentifier: "8", label: "8", isNonKorean: true),
-            "9": VirtualKey(keyIdentifier: "9", label: "9", isNonKorean: true),
-            "0": VirtualKey(keyIdentifier: "0", label: "0", isNonKorean: true),
+            "1": VirtualKey(keyIdentifier: "1", label: "1", isNonJamo: true),
+            "2": VirtualKey(keyIdentifier: "2", label: "2", isNonJamo: true),
+            "3": VirtualKey(keyIdentifier: "3", label: "3", isNonJamo: true),
+            "4": VirtualKey(keyIdentifier: "4", label: "4", isNonJamo: true),
+            "5": VirtualKey(keyIdentifier: "5", label: "5", isNonJamo: true),
+            "6": VirtualKey(keyIdentifier: "6", label: "6", isNonJamo: true),
+            "7": VirtualKey(keyIdentifier: "7", label: "7", isNonJamo: true),
+            "8": VirtualKey(keyIdentifier: "8", label: "8", isNonJamo: true),
+            "9": VirtualKey(keyIdentifier: "9", label: "9", isNonJamo: true),
+            "0": VirtualKey(keyIdentifier: "0", label: "0", isNonJamo: true),
 
             // 특수 문자
-            "`": VirtualKey(keyIdentifier: "`", label: "`", isNonKorean: true),
-            "-": VirtualKey(keyIdentifier: "-", label: "-", isNonKorean: true),
-            "=": VirtualKey(keyIdentifier: "=", label: "=", isNonKorean: true),
-            "[": VirtualKey(keyIdentifier: "[", label: "[", isNonKorean: true),
-            "]": VirtualKey(keyIdentifier: "]", label: "]", isNonKorean: true),
-            "\\": VirtualKey(keyIdentifier: "\\", label: "\\", isNonKorean: true),
-            ";": VirtualKey(keyIdentifier: ";", label: ";", isNonKorean: true),
-            "'": VirtualKey(keyIdentifier: "'", label: "'", isNonKorean: true),
-            ",": VirtualKey(keyIdentifier: ",", label: ",", isNonKorean: true),
-            ".": VirtualKey(keyIdentifier: ".", label: ".", isNonKorean: true),
-            "/": VirtualKey(keyIdentifier: "/", label: "/", isNonKorean: true),
-            " ": VirtualKey(keyIdentifier: " ", label: " ", isNonKorean: true), // 스페이스
-            "~": VirtualKey(keyIdentifier: "~", label: "~", isNonKorean: true),
-            "!": VirtualKey(keyIdentifier: "!", label: "!", isNonKorean: true),
-            "@": VirtualKey(keyIdentifier: "@", label: "@", isNonKorean: true),
-            "#": VirtualKey(keyIdentifier: "#", label: "#", isNonKorean: true),
-            "$": VirtualKey(keyIdentifier: "$", label: "$", isNonKorean: true),
-            "%": VirtualKey(keyIdentifier: "%", label: "%", isNonKorean: true),
-            "^": VirtualKey(keyIdentifier: "^", label: "^", isNonKorean: true),
-            "&": VirtualKey(keyIdentifier: "&", label: "&", isNonKorean: true),
-            "*": VirtualKey(keyIdentifier: "*", label: "*", isNonKorean: true),
-            "(": VirtualKey(keyIdentifier: "(", label: "(", isNonKorean: true),
-            ")": VirtualKey(keyIdentifier: ")", label: ")", isNonKorean: true),
-            "_": VirtualKey(keyIdentifier: "_", label: "_", isNonKorean: true),
-            "+": VirtualKey(keyIdentifier: "+", label: "+", isNonKorean: true),
-            "{": VirtualKey(keyIdentifier: "{", label: "{", isNonKorean: true),
-            "}": VirtualKey(keyIdentifier: "}", label: "}", isNonKorean: true),
-            "|": VirtualKey(keyIdentifier: "|", label: "|", isNonKorean: true),
-            ":": VirtualKey(keyIdentifier: ":", label: ":", isNonKorean: true),
-            "\"": VirtualKey(keyIdentifier: "\"", label: "\"", isNonKorean: true),
-            "<": VirtualKey(keyIdentifier: "<", label: "<", isNonKorean: true),
-            ">": VirtualKey(keyIdentifier: ">", label: ">", isNonKorean: true),
-            "?": VirtualKey(keyIdentifier: "?", label: "?", isNonKorean: true),
+            "`": VirtualKey(keyIdentifier: "`", label: "`", isNonJamo: true),
+            "-": VirtualKey(keyIdentifier: "-", label: "-", isNonJamo: true),
+            "=": VirtualKey(keyIdentifier: "=", label: "=", isNonJamo: true),
+            "[": VirtualKey(keyIdentifier: "[", label: "[", isNonJamo: true),
+            "]": VirtualKey(keyIdentifier: "]", label: "]", isNonJamo: true),
+            "\\": VirtualKey(keyIdentifier: "\\", label: "\\", isNonJamo: true),
+            ";": VirtualKey(keyIdentifier: ";", label: ";", isNonJamo: true),
+            "'": VirtualKey(keyIdentifier: "'", label: "'", isNonJamo: true),
+            ",": VirtualKey(keyIdentifier: ",", label: ",", isNonJamo: true),
+            ".": VirtualKey(keyIdentifier: ".", label: ".", isNonJamo: true),
+            "/": VirtualKey(keyIdentifier: "/", label: "/", isNonJamo: true),
+            " ": VirtualKey(keyIdentifier: " ", label: " ", isNonJamo: true), // 스페이스
+            "~": VirtualKey(keyIdentifier: "~", label: "~", isNonJamo: true),
+            "!": VirtualKey(keyIdentifier: "!", label: "!", isNonJamo: true),
+            "@": VirtualKey(keyIdentifier: "@", label: "@", isNonJamo: true),
+            "#": VirtualKey(keyIdentifier: "#", label: "#", isNonJamo: true),
+            "$": VirtualKey(keyIdentifier: "$", label: "$", isNonJamo: true),
+            "%": VirtualKey(keyIdentifier: "%", label: "%", isNonJamo: true),
+            "^": VirtualKey(keyIdentifier: "^", label: "^", isNonJamo: true),
+            "&": VirtualKey(keyIdentifier: "&", label: "&", isNonJamo: true),
+            "*": VirtualKey(keyIdentifier: "*", label: "*", isNonJamo: true),
+            "(": VirtualKey(keyIdentifier: "(", label: "(", isNonJamo: true),
+            ")": VirtualKey(keyIdentifier: ")", label: ")", isNonJamo: true),
+            "_": VirtualKey(keyIdentifier: "_", label: "_", isNonJamo: true),
+            "+": VirtualKey(keyIdentifier: "+", label: "+", isNonJamo: true),
+            "{": VirtualKey(keyIdentifier: "{", label: "{", isNonJamo: true),
+            "}": VirtualKey(keyIdentifier: "}", label: "}", isNonJamo: true),
+            "|": VirtualKey(keyIdentifier: "|", label: "|", isNonJamo: true),
+            ":": VirtualKey(keyIdentifier: ":", label: ":", isNonJamo: true),
+            "\"": VirtualKey(keyIdentifier: "\"", label: "\"", isNonJamo: true),
+            "<": VirtualKey(keyIdentifier: "<", label: "<", isNonJamo: true),
+            ">": VirtualKey(keyIdentifier: ">", label: ">", isNonJamo: true),
+            "?": VirtualKey(keyIdentifier: "?", label: "?", isNonJamo: true),
 
             // 자음
             "r": VirtualKey(keyIdentifier: "ㄱ", label: "ㄱ"),
@@ -112,7 +112,7 @@ public final class StandardDubeolsik: KoreanIME {
         let choseongAutomaton = createChoseongAutomaton()
         let jungseongAutomaton = createJungseongAutomaton()
         let jongseongAutomaton = createJongseongAutomaton()
-        let specialCharacterAutomaton = createSpecialCharacterAutomaton()
+        let nonJamoAutomaton = createNonJamoAutomaton()
         let dokkaebiAutomaton = createDokkaebiAutomaton()
         let backspaceAutomaton = createBackspaceAutomaton()
         
@@ -127,15 +127,15 @@ public final class StandardDubeolsik: KoreanIME {
             choseongAutomaton: choseongAutomaton,
             jungseongAutomaton: jungseongAutomaton,
             jongseongAutomaton: jongseongAutomaton,
-            specialCharacterAutomaton: specialCharacterAutomaton,
+            nonJamoAutomaton: nonJamoAutomaton,
             dokkaebiAutomaton: dokkaebiAutomaton,
             backspaceAutomaton: backspaceAutomaton,
             config: config
         )
     }
     
-    private static func createSpecialCharacterAutomaton() -> SpecialCharacterAutomaton {
-        let automaton = SpecialCharacterAutomaton()
+    private static func createNonJamoAutomaton() -> NonJamoAutomaton {
+        let automaton = NonJamoAutomaton()
         
         // createLayout에서 정의된 일반키와 특수문자들을 추출하여 오토마타에 추가
         let layout = createLayout()

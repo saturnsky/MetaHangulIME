@@ -36,7 +36,7 @@ public final class CheonJiIn: KoreanIME {
             "3": VirtualKey(keyIdentifier: "ㅡ", label: "ㅡ"),
             
             // 특수문자
-            "c": VirtualKey(keyIdentifier: ".", label: ".", isNonKorean: true)  // Python 구현과 일치
+            "c": VirtualKey(keyIdentifier: ".", label: ".", isNonJamo: true)
         ]
     }
     
@@ -48,7 +48,7 @@ public final class CheonJiIn: KoreanIME {
         let jongseongAutomaton = createJongseongAutomaton()
         let dokkaebiAutomaton = createDokkaebiAutomaton()
         let backspaceAutomaton = createBackspaceAutomaton()
-        let specialCharacterAutomaton = createSpecialCharacterAutomaton()
+        let nonJamoAutomaton = createNonJamoAutomaton()
         
         let config = InputProcessorConfig(
             orderMode: .sequential,
@@ -61,7 +61,7 @@ public final class CheonJiIn: KoreanIME {
             choseongAutomaton: choseongAutomaton,
             jungseongAutomaton: jungseongAutomaton,
             jongseongAutomaton: jongseongAutomaton,
-            specialCharacterAutomaton: specialCharacterAutomaton,
+            nonJamoAutomaton: nonJamoAutomaton,
             dokkaebiAutomaton: dokkaebiAutomaton,
             backspaceAutomaton: backspaceAutomaton,
             config: config
@@ -430,10 +430,9 @@ public final class CheonJiIn: KoreanIME {
         return automaton
     }
     
-    private static func createSpecialCharacterAutomaton() -> SpecialCharacterAutomaton {
-        let automaton = SpecialCharacterAutomaton()
+    private static func createNonJamoAutomaton() -> NonJamoAutomaton {
+        let automaton = NonJamoAutomaton()
         
-        // Python 구현과 일치하는 기본 전이
         automaton.addTransition(from: "", input: ".", to: ".")
         
         // . + . = ,

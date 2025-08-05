@@ -35,14 +35,14 @@ public class IMEFactory {
         // 옵셔널 오토마타
         let dokkaebiAutomaton = configuration.automata.dokkaebibul.map { createDokkaebiAutomaton(from: $0) }
         let backspaceAutomaton = configuration.automata.backspace.map { createBackspaceAutomaton(from: $0) }
-        let specialCharacterAutomaton = configuration.automata.specialCharacter.map { createSpecialCharacterAutomaton(from: $0) }
+        let nonJamoAutomaton = configuration.automata.specialCharacter.map { createNonJamoAutomaton(from: $0) }
         
         // InputProcessor 생성
         let processor = InputProcessor(
             choseongAutomaton: choseongAutomaton,
             jungseongAutomaton: jungseongAutomaton,
             jongseongAutomaton: jongseongAutomaton,
-            specialCharacterAutomaton: specialCharacterAutomaton,
+            nonJamoAutomaton: nonJamoAutomaton,
             dokkaebiAutomaton: dokkaebiAutomaton,
             backspaceAutomaton: backspaceAutomaton,
             config: processorConfig
@@ -96,7 +96,7 @@ private extension IMEFactory {
             layout[key] = VirtualKey(
                 keyIdentifier: definition.identifier,
                 label: definition.label,
-                isNonKorean: definition.isNonKorean ?? false
+                isNonJamo: definition.isNonJamo ?? false
             )
         }
         
@@ -183,8 +183,8 @@ private extension IMEFactory {
         return automaton
     }
     
-    static func createSpecialCharacterAutomaton(from definition: SpecialCharacterDefinition) -> SpecialCharacterAutomaton {
-        let automaton = SpecialCharacterAutomaton()
+    static func createNonJamoAutomaton(from definition: SpecialCharacterDefinition) -> NonJamoAutomaton {
+        let automaton = NonJamoAutomaton()
         
         for transition in definition.transitions {
             automaton.addTransition(

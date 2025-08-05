@@ -16,16 +16,16 @@ public struct VirtualKey: Equatable, Hashable {
     /// 키의 표시 레이블
     public let label: String
     
-    /// 특수 키(한글이 아닌) 여부
-    public let isNonKorean: Bool
+    /// 자모가 아닌 키 여부
+    public let isNonJamo: Bool
     
     /// 성능을 위한 캐시된 해시 값
     private let cachedHash: Int
     
-    public init(keyIdentifier: String, label: String = "", isNonKorean: Bool = false) {
+    public init(keyIdentifier: String, label: String = "", isNonJamo: Bool = false) {
         self.keyIdentifier = keyIdentifier
         self.label = label.isEmpty ? keyIdentifier : label
-        self.isNonKorean = isNonKorean
+        self.isNonJamo = isNonJamo
         
         // 성능을 위해 해시를 미리 계산 (keyIdentifier만 사용, 고유하므로)
         self.cachedHash = keyIdentifier.hashValue

@@ -28,8 +28,8 @@ layout:
   v: { identifier: "ㅁ", label: "ㅁ" }
   
   # 특수문자
-  b: { identifier: ".,", label: ".,", isNonKorean: true }
-  n: { identifier: "?!", label: "?!", isNonKorean: true }
+  b: { identifier: ".,", label: ".,", isNonJamo: true }
+  n: { identifier: "?!", label: "?!", isNonJamo: true }
 
 automata:
   choseong:

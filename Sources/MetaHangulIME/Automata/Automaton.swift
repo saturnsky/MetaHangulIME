@@ -100,5 +100,5 @@ public final class JungseongAutomaton: Automaton {}
 /// Jongseong (final consonant) automaton
 public final class JongseongAutomaton: Automaton {}
 
-/// Special character automaton
-public final class SpecialCharacterAutomaton: Automaton {}
+/// Non-jamo character automaton
+public final class NonJamoAutomaton: Automaton {}

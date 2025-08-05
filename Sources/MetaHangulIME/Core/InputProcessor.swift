@@ -53,7 +53,7 @@ public final class InputProcessor {
     private let choseongAutomaton: ChoseongAutomaton
     private let jungseongAutomaton: JungseongAutomaton
     private let jongseongAutomaton: JongseongAutomaton
-    private let specialCharacterAutomaton: SpecialCharacterAutomaton?
+    private let nonJamoAutomaton: NonJamoAutomaton?
     private let dokkaebiAutomaton: DokkaebiAutomaton?
     private let backspaceAutomaton: BackspaceAutomaton?
     
@@ -70,14 +70,14 @@ public final class InputProcessor {
     public init(choseongAutomaton: ChoseongAutomaton,
                 jungseongAutomaton: JungseongAutomaton,
                 jongseongAutomaton: JongseongAutomaton,
-                specialCharacterAutomaton: SpecialCharacterAutomaton? = nil,
+                nonJamoAutomaton: NonJamoAutomaton? = nil,
                 dokkaebiAutomaton: DokkaebiAutomaton? = nil,
                 backspaceAutomaton: BackspaceAutomaton? = nil,
                 config: InputProcessorConfig = InputProcessorConfig()) {
         self.choseongAutomaton = choseongAutomaton
         self.jungseongAutomaton = jungseongAutomaton
         self.jongseongAutomaton = jongseongAutomaton
-        self.specialCharacterAutomaton = specialCharacterAutomaton
+        self.nonJamoAutomaton = nonJamoAutomaton
         self.dokkaebiAutomaton = dokkaebiAutomaton
         self.backspaceAutomaton = backspaceAutomaton
         self.config = config
@@ -87,8 +87,8 @@ public final class InputProcessor {
     public func process(previousState: SyllableState?,
                        currentState: SyllableState,
                        inputKey: VirtualKey) -> ProcessResult {
-        // 특수문자 처리. 특수문자는 한글과 조합되지 않으며, 특수문자 오토마타를 사용
-        if inputKey.isNonKorean {
+        // 자모가 아닌 문자 처리. 자모가 아닌 문자는 한글과 조합되지 않으며, NonJamo 오토마타를 사용
+        if inputKey.isNonJamo {
             return handleSpecialCharacter(
                 previousState: previousState,
                 currentState: currentState,
@@ -178,7 +178,7 @@ public final class InputProcessor {
     /// - modernPartial 모드: 첫 음절에서 표시 가능한 부분까지만 표시
     public func buildDisplay(_ state: SyllableState) -> String {
         if let specialChar = state.specialCharacterState {
-            return specialCharacterAutomaton?.display(specialChar) ?? ""
+            return nonJamoAutomaton?.display(specialChar) ?? ""
         }
         
         switch config.displayMode {
@@ -199,7 +199,7 @@ public final class InputProcessor {
                                       currentState: SyllableState,
                                       inputKey: VirtualKey) -> ProcessResult {
         // transition이 존재하는 경우, 현재 상태를 업데이트
-        if let specialAutomaton = specialCharacterAutomaton,
+        if let specialAutomaton = nonJamoAutomaton,
            let currentSpecial = currentState.specialCharacterState {
             if let newSpecial = specialAutomaton.transition(
                 currentState: currentSpecial,
@@ -216,7 +216,7 @@ public final class InputProcessor {
         
         // 조합이 없을 경우, 새 음절을 생성
         let newState = SyllableState()
-        if let specialAutomaton = specialCharacterAutomaton,
+        if let specialAutomaton = nonJamoAutomaton,
            let newSpecial = specialAutomaton.transition(
                currentState: nil,
                inputKey: inputKey.keyIdentifier

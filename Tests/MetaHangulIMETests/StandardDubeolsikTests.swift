@@ -221,7 +221,7 @@ final class StandardDubeolsikTests: XCTestCase {
         XCTAssertEqual(result1, "ㄱ", "Second syllable initial not correct")
         
         _ = ime.input("m")  // 그
-        let result2 = ime.input("f")  // 글
+        _ = ime.input("f")  // 글
         
         _ = ime.forceCommit()
         let finalText = capturedCommitText

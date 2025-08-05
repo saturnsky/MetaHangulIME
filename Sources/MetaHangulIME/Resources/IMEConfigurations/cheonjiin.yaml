@@ -24,7 +24,7 @@ layout:
   "3": { identifier: "ㅡ", label: "ㅡ" }
   
   # 특수문자
-  c: { identifier: ".,?!", label: ".,?!", isNonKorean: true }
+  c: { identifier: ".,?!", label: ".,?!", isNonJamo: true }
 
 automata:
   choseong:

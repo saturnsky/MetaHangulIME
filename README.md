@@ -1,5 +1,7 @@
 # Meta Hangul IME for Swift
 
+> ⚠️ **Experimental Stage**: 이 프로젝트는 현재 실험적 단계에 있습니다. 버전 업데이트 시 설정 파일 형식, API, 동작 방식 등이 변경될 수 있으며, 이전 버전과의 호환성이 보장되지 않을 수 있습니다.
+
 Meta Hangul IME는 다양한 한글 입력 방식을 통합 지원하는 범용 프레임워크입니다. 키보드 기반 한글 입력기의 다양한 입력 방식과 규칙을 추상화하여, 하나의 엔진으로 여러 입력기를 구현할 수 있도록 설계되었습니다.
 
 ## 주요 특징
@@ -175,7 +177,7 @@ extension ViewController: KoreanIMEDelegate {
 public struct VirtualKey {
     public let keyIdentifier: String    // 내부 처리용 식별자
     public let label?: String           // 표시용 레이블
-    public let isNonKorean: Bool      // 한글이 아닌 문자 여부
+    public let isNonJamo: Bool        // 자모가 아닌 문자 여부
 }
 
 // 음절 상태 관리
@@ -232,7 +234,7 @@ layout:
   q: { identifier: "ㄱ", label: "ㄱ" }
   w: { identifier: "ㄴ", label: "ㄴ" }
   1: { identifier: "ㅣ", label: "ㅣ" }
-  c: { identifier: ".,?!", label: ".,?!", isNonKorean: true }
+  c: { identifier: ".,?!", label: ".,?!", isNonJamo: true }
 
 # 오토마타 정의
 automata:

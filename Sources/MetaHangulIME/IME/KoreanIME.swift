@@ -139,14 +139,14 @@ open class KoreanIME {
             inputKey: virtualKey
         )
         
-        // 특수문자가 입력되고 한글이 있는 경우, 먼저 커밋
-        // 특수문자만 있는 것이 아닌 실제 한글 텍스트가 있는 경우에만 커밋
+        // 자모가 아닌 문자가 입력되고 한글이 있는 경우, 먼저 커밋
+        // 자모가 아닌 문자만 있는 것이 아닌 실제 한글 텍스트가 있는 경우에만 커밋
         let hasHangulText = (previousState?.hasHangul ?? false) || currentState.hasHangul
-        if virtualKey.isNonKorean && hasHangulText {
-            // 특수문자 처리 전에 현재 조합 커밋
+        if virtualKey.isNonJamo && hasHangulText {
+            // 자모가 아닌 문자 처리 전에 현재 조합 커밋
             performCommitAll()
             
-            // 빈 상태에서 특수문자를 다시 처리
+            // 빈 상태에서 자모가 아닌 문자를 다시 처리
             let specialResult = processor.process(
                 previousState: previousState,
                 currentState: currentState,
