@@ -378,3 +378,7 @@ swift test --filter CheonJiInTests
 
 - [RULES.md](RULES.md) - 메타한글 입력기의 4가지 핵심 규칙
 - [AUTOMATA.md](AUTOMATA.md) - 오토마타 작성용 상세 가이드
+
+## 라이센스
+
+이 프로젝트는 MIT 라이센스 하에 배포됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
