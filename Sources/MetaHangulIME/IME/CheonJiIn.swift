@@ -10,17 +10,16 @@ import Foundation
 /// 천지인 IME 구현
 /// 천지인은 최소한의 키를 사용하는 모바일 한국어 입력 방식
 public final class CheonJiIn: KoreanIME {
-    
     public init() {
         let processor = CheonJiIn.createProcessor()
         let layout = CheonJiIn.createLayout()
         super.init(processor: processor, layout: layout)
     }
-    
+
     // MARK: - 레이아웃 생성
-    
+
     public static func createLayout() -> [String: VirtualKey] {
-        return [
+        [
             // 자음
             "q": VirtualKey(keyIdentifier: "ㄱ", label: "ㄱ"),
             "w": VirtualKey(keyIdentifier: "ㄴ", label: "ㄴ"),
@@ -29,19 +28,19 @@ public final class CheonJiIn: KoreanIME {
             "s": VirtualKey(keyIdentifier: "ㅅ", label: "ㅅ"),
             "d": VirtualKey(keyIdentifier: "ㅈ", label: "ㅈ"),
             "x": VirtualKey(keyIdentifier: "ㅇ", label: "ㅇ"),
-            
+
             // 모음
             "1": VirtualKey(keyIdentifier: "ㅣ", label: "ㅣ"),
             "2": VirtualKey(keyIdentifier: "ㆍ", label: "ㆍ"),
             "3": VirtualKey(keyIdentifier: "ㅡ", label: "ㅡ"),
-            
+
             // 특수문자
-            "c": VirtualKey(keyIdentifier: ".", label: ".", isNonJamo: true)
+            "c": VirtualKey(keyIdentifier: ".", label: ".", isNonJamo: true),
         ]
     }
-    
+
     // MARK: - 프로세서 생성
-    
+
     private static func createProcessor() -> InputProcessor {
         let choseongAutomaton = createChoseongAutomaton()
         let jungseongAutomaton = createJungseongAutomaton()
@@ -49,14 +48,14 @@ public final class CheonJiIn: KoreanIME {
         let dokkaebiAutomaton = createDokkaebiAutomaton()
         let backspaceAutomaton = createBackspaceAutomaton()
         let nonJamoAutomaton = createNonJamoAutomaton()
-        
+
         let config = InputProcessorConfig(
             orderMode: .sequential,
             commitUnit: .explicitCommit,  // 천지인은 명시적 커밋 사용
             displayMode: .modernMultiple,
             supportStandaloneCluster: true  // 천지인은 종성부용초성 지원
         )
-        
+
         return InputProcessor(
             choseongAutomaton: choseongAutomaton,
             jungseongAutomaton: jungseongAutomaton,
@@ -67,50 +66,50 @@ public final class CheonJiIn: KoreanIME {
             config: config
         )
     }
-    
+
     // MARK: - 오토마타 생성
-    
+
     private static func createChoseongAutomaton() -> ChoseongAutomaton {
         let automaton = ChoseongAutomaton()
-        
+
         // 기본 자음
         let baseConsonants = ["ㄱ", "ㄴ", "ㄷ", "ㅂ", "ㅅ", "ㅈ", "ㅇ"]
         for consonant in baseConsonants {
             automaton.addTransition(from: "", input: consonant, to: consonant)
         }
-        
+
         // cheonjiin.md에 따른 조합
         // ㄱ + ㄱ = ㅋ
         automaton.addTransition(from: "ㄱ", input: "ㄱ", to: "ㅋ")
         // ㅋ + ㄱ = ㄲ
         automaton.addTransition(from: "ㅋ", input: "ㄱ", to: "ㄲ")
-        
+
         // ㄴ + ㄴ = ㄹ
         automaton.addTransition(from: "ㄴ", input: "ㄴ", to: "ㄹ")
-        
+
         // ㄷ + ㄷ = ㅌ
         automaton.addTransition(from: "ㄷ", input: "ㄷ", to: "ㅌ")
         // ㅌ + ㄷ = ㄸ
         automaton.addTransition(from: "ㅌ", input: "ㄷ", to: "ㄸ")
-        
+
         // ㅂ + ㅂ = ㅍ
         automaton.addTransition(from: "ㅂ", input: "ㅂ", to: "ㅍ")
         // ㅍ + ㅂ = ㅃ
         automaton.addTransition(from: "ㅍ", input: "ㅂ", to: "ㅃ")
-        
+
         // ㅅ + ㅅ = ㅎ
         automaton.addTransition(from: "ㅅ", input: "ㅅ", to: "ㅎ")
         // ㅎ + ㅅ = ㅆ
         automaton.addTransition(from: "ㅎ", input: "ㅅ", to: "ㅆ")
-        
+
         // ㅈ + ㅈ = ㅊ
         automaton.addTransition(from: "ㅈ", input: "ㅈ", to: "ㅊ")
         // ㅊ + ㅈ = ㅉ
         automaton.addTransition(from: "ㅊ", input: "ㅈ", to: "ㅉ")
-        
+
         // ㅇ + ㅇ = ㅁ
         automaton.addTransition(from: "ㅇ", input: "ㅇ", to: "ㅁ")
-        
+
         // 표시 매핑
         let displayMappings: [(state: String, display: String)] = [
             ("ㄱ", "\u{1100}"),  // ᄀ
@@ -131,16 +130,16 @@ public final class CheonJiIn: KoreanIME {
             ("ㅋ", "\u{110F}"),  // ᄏ
             ("ㅌ", "\u{1110}"),  // ᄐ
             ("ㅍ", "\u{1111}"),  // ᄑ
-            ("ㅎ", "\u{1112}")   // ᄒ
+            ("ㅎ", "\u{1112}"),  // ᄒ
         ]
-        
+
         for (state, display) in displayMappings {
             automaton.addDisplay(state: state, display: display)
         }
-        
+
         return automaton
     }
-    
+
     private static func createJungseongAutomaton() -> JungseongAutomaton {
         let automaton = JungseongAutomaton()
         // 기본 모음
@@ -227,13 +226,13 @@ public final class CheonJiIn: KoreanIME {
         automaton.addTransition(from: "ㅜ", input: "ㅣ", to: "ㅟ")
         // ㅡ + ㅣ = ㅢ
         automaton.addTransition(from: "ㅡ", input: "ㅣ", to: "ㅢ")
-        
+
         return automaton
     }
-    
+
     private static func createJongseongAutomaton() -> JongseongAutomaton {
         let automaton = JongseongAutomaton()
-        
+
         // 기본 자음
         let baseConsonants = ["ㄱ", "ㄴ", "ㄷ", "ㅂ", "ㅅ", "ㅈ", "ㅇ"]
         for consonant in baseConsonants {
@@ -338,10 +337,10 @@ public final class CheonJiIn: KoreanIME {
         automaton.addDisplay(state: "ㄴㅅ", display: "\u{11AB}\u{11BA}") // ᆫᆺ (중간 상태로 처리됨)
         automaton.addDisplay(state: "ㄹㅇ", display: "\u{11AF}\u{11BC}") // ᆯᆼ (중간 상태로 처리됨)
         automaton.addDisplay(state: "ㄹㄷ", display: "\u{11AF}\u{11AE}") // ᆯᆮ (중간 상태로 처리됨)
-        
+
         return automaton
     }
-    
+
     private static func createDokkaebiAutomaton() -> DokkaebiAutomaton {
         let automaton = DokkaebiAutomaton()
 
@@ -382,10 +381,10 @@ public final class CheonJiIn: KoreanIME {
         automaton.addTransition(jongseongState: "ㅎ", remainingJong: nil, movedCho: "ㅎ")
         automaton.addTransition(jongseongState: "ㄲ", remainingJong: nil, movedCho: "ㄲ")
         automaton.addTransition(jongseongState: "ㅆ", remainingJong: nil, movedCho: "ㅆ")
-        
+
         return automaton
     }
-    
+
     private static func createBackspaceAutomaton() -> BackspaceAutomaton {
         let automaton = BackspaceAutomaton()
 
@@ -426,28 +425,28 @@ public final class CheonJiIn: KoreanIME {
         automaton.addTransition(from: "ㅀ", to: "ㄽ")
         automaton.addTransition(from: "ㄿ", to: "ㄼ")
         automaton.addTransition(from: "ㅄ", to: "ㅂ")
-        
+
         return automaton
     }
-    
+
     private static func createNonJamoAutomaton() -> NonJamoAutomaton {
         let automaton = NonJamoAutomaton()
-        
+
         automaton.addTransition(from: "", input: ".", to: ".")
-        
+
         // . + . = ,
         automaton.addTransition(from: ".", input: ".", to: ",")
         // , + . = ?
         automaton.addTransition(from: ",", input: ".", to: "?")
         // ? + . = !
         automaton.addTransition(from: "?", input: ".", to: "!")
-        
+
         // 표시 매핑
         automaton.addDisplay(state: ".", display: ".")
         automaton.addDisplay(state: ",", display: ",")
         automaton.addDisplay(state: "?", display: "?")
         automaton.addDisplay(state: "!", display: "!")
-        
+
         return automaton
     }
 }

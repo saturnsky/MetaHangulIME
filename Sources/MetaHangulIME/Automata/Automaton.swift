@@ -13,15 +13,15 @@ open class Automaton {
     /// Transition table: Maps (current_state, input_key) -> new_state
     /// Using nested dictionary for O(1) lookup performance
     private var transitionTable: [String: [String: String]] = [:]
-    
+
     /// Display table: Maps state -> Unicode character for display
     private var displayTable: [String: String] = [:]
-    
+
     /// Set of all valid states for quick validation
     private var validStates: Set<String> = [""]
-    
+
     public init() {}
-    
+
     /// Perform state transition
     /// - Parameters:
     ///   - currentState: Current state (nil represents empty state)
@@ -32,23 +32,23 @@ open class Automaton {
         let state = currentState ?? ""
         return transitionTable[state]?[inputKey]
     }
-    
+
     /// Get display character for a state
     /// - Parameter state: State to display
     /// - Returns: Display character or the state itself if no mapping exists
     @inline(__always)
     public func display(_ state: String) -> String {
-        return displayTable[state] ?? state
+        displayTable[state] ?? state
     }
-    
+
     /// Check if a state exists in this automaton
     /// - Parameter state: State to check
     /// - Returns: true if state exists
     @inline(__always)
     public func hasState(_ state: String) -> Bool {
-        return validStates.contains(state)
+        validStates.contains(state)
     }
-    
+
     /// Add a state transition
     /// - Parameters:
     ///   - fromState: Source state (empty string for initial state)
@@ -59,12 +59,12 @@ open class Automaton {
             transitionTable[fromState] = [:]
         }
         transitionTable[fromState]?[inputKey] = toState
-        
+
         // Track valid states
         validStates.insert(fromState)
         validStates.insert(toState)
     }
-    
+
     /// Add a display mapping
     /// - Parameters:
     ///   - state: State to map
@@ -73,7 +73,7 @@ open class Automaton {
         displayTable[state] = display
         validStates.insert(state)
     }
-    
+
     /// Batch add transitions for performance
     /// - Parameter transitions: Array of (fromState, inputKey, toState) tuples
     public func addTransitions(_ transitions: [(from: String, input: String, to: String)]) {
@@ -81,7 +81,7 @@ open class Automaton {
             addTransition(from: transition.from, input: transition.input, to: transition.to)
         }
     }
-    
+
     /// Batch add display mappings for performance
     /// - Parameter displays: Dictionary of state -> display mappings
     public func addDisplays(_ displays: [String: String]) {

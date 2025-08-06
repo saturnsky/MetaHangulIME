@@ -11,16 +11,18 @@ import Foundation
 public struct DokkaebiResult {
     /// Whether dokkaebi splitting should occur
     public let shouldSplit: Bool
-    
+
     /// Remaining jongseong state in current syllable (nil if completely moved)
     public let remainingJongseongState: String?
-    
+
     /// Choseong state to move to next syllable
     public let movedChoseongState: String
-    
-    public init(shouldSplit: Bool, 
-                remainingJongseongState: String? = nil,
-                movedChoseongState: String = "") {
+
+    public init(
+        shouldSplit: Bool,
+        remainingJongseongState: String? = nil,
+        movedChoseongState: String = ""
+    ) {
         self.shouldSplit = shouldSplit
         self.remainingJongseongState = remainingJongseongState
         self.movedChoseongState = movedChoseongState
@@ -39,28 +41,30 @@ public final class DokkaebiAutomaton {
     /// Transition table: jongseong -> (remaining_jong, moved_cho)
     /// Using dictionary for O(1) lookup
     private var transitionTable: [String: (remaining: String?, moved: String)] = [:]
-    
+
     public init() {}
-    
+
     /// Add a dokkaebi transition rule
     /// - Parameters:
     ///   - jongseongState: Jongseong state that triggers dokkaebi
     ///   - remainingJong: Jongseong that remains (nil if completely moves)
     ///   - movedCho: Choseong that moves to next syllable
-    public func addTransition(jongseongState: String, 
-                            remainingJong: String?, 
-                            movedCho: String) {
+    public func addTransition(
+        jongseongState: String,
+        remainingJong: String?,
+        movedCho: String
+    ) {
         transitionTable[jongseongState] = (remainingJong, movedCho)
     }
-    
+
     /// Check if dokkaebi can occur for given jongseong
     /// - Parameter jongseongState: Current jongseong state
     /// - Returns: true if dokkaebi can occur
     @inline(__always)
     public func canSplit(_ jongseongState: String) -> Bool {
-        return transitionTable[jongseongState] != nil
+        transitionTable[jongseongState] != nil
     }
-    
+
     /// Process dokkaebi phenomenon
     /// - Parameter jongseongState: Current jongseong state
     /// - Returns: DokkaebiResult with split information
@@ -72,14 +76,14 @@ public final class DokkaebiAutomaton {
                 movedChoseongState: moved
             )
         }
-        
+
         return DokkaebiResult(
             shouldSplit: false,
             remainingJongseongState: jongseongState,
             movedChoseongState: ""
         )
     }
-    
+
     /// Batch add transitions for performance
     /// - Parameter transitions: Array of (jongseong, remaining, moved) tuples
     public func addTransitions(_ transitions: [(jongseong: String, remaining: String?, moved: String)]) {

@@ -1,3 +1,10 @@
+//
+//  BasicTests.swift
+//  MetaHangulIME
+//
+//  Basic tests to ensure the module builds
+//
+
 import XCTest
 @testable import MetaHangulIME
 

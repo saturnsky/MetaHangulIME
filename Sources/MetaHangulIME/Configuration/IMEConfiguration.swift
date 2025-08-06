@@ -29,13 +29,13 @@ public struct KeyDefinition: Codable {
     public let identifier: String
     public let label: String
     public let isNonJamo: Bool?
-    
+
     private enum CodingKeys: String, CodingKey {
         case identifier
         case label
         case isNonJamo
     }
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         identifier = try container.decode(String.self, forKey: .identifier)
@@ -104,15 +104,15 @@ extension ProcessorConfig {
         guard let orderMode = OrderMode.from(string: orderMode) else {
             throw ConfigurationError.invalidOrderMode(orderMode)
         }
-        
+
         guard let commitUnit = CommitUnit.from(string: commitUnit) else {
             throw ConfigurationError.invalidCommitUnit(commitUnit)
         }
-        
+
         guard let displayMode = DisplayMode.from(string: displayMode) else {
             throw ConfigurationError.invalidDisplayMode(displayMode)
         }
-        
+
         return InputProcessorConfig(
             orderMode: orderMode,
             commitUnit: commitUnit,
@@ -130,7 +130,7 @@ public enum ConfigurationError: LocalizedError {
     case invalidDisplayMode(String)
     case invalidYAML
     case fileNotFound(String)
-    
+
     public var errorDescription: String? {
         switch self {
         case .invalidOrderMode(let mode):

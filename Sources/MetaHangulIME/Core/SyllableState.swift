@@ -12,49 +12,51 @@ import Foundation
 public final class SyllableState {
     /// 현재 초성 상태
     public var choseongState: String?
-    
+
     /// 현재 중성 상태
     public var jungseongState: String?
-    
+
     /// 현재 종성 상태
     public var jongseongState: String?
-    
+
     /// 한글이 아닌 입력을 위한 특수문자 상태
     public var specialCharacterState: String?
-    
+
     /// 자모가 입력된 순서를 추적 (FREE_ORDER 모드용)
     /// 성능을 위해 배열 사용 (append는 평균 O(1))
     public var compositionOrder: [JamoPosition] = []
-    
-    public init(choseongState: String? = nil,
-                jungseongState: String? = nil,
-                jongseongState: String? = nil,
-                specialCharacterState: String? = nil,
-                compositionOrder: [JamoPosition] = []) {
+
+    public init(
+        choseongState: String? = nil,
+        jungseongState: String? = nil,
+        jongseongState: String? = nil,
+        specialCharacterState: String? = nil,
+        compositionOrder: [JamoPosition] = []
+    ) {
         self.choseongState = choseongState
         self.jungseongState = jungseongState
         self.jongseongState = jongseongState
         self.specialCharacterState = specialCharacterState
         self.compositionOrder = compositionOrder
     }
-    
+
     /// 상태가 완전히 비어있는지 여부
     @inline(__always)
     public var isEmpty: Bool {
-        return choseongState == nil &&
-               jungseongState == nil &&
-               jongseongState == nil &&
-               specialCharacterState == nil
+        choseongState == nil &&
+        jungseongState == nil &&
+        jongseongState == nil &&
+        specialCharacterState == nil
     }
-    
+
     /// 상태가 한글 자모를 포함하고 있는지 여부
     @inline(__always)
     public var hasHangul: Bool {
-        return choseongState != nil ||
-               jungseongState != nil ||
-               jongseongState != nil
+        choseongState != nil ||
+        jungseongState != nil ||
+        jongseongState != nil
     }
-    
+
     /// 순서 모드에 따라 자모 위치를 추가할 수 있는지 확인
     public func canAddJamo(position: JamoPosition, orderMode: OrderMode) -> Bool {
         switch orderMode {
@@ -68,25 +70,23 @@ public final class SyllableState {
             case .jongseong:
                 return true
             }
-            
+
         case .freeOrder:
             // 자유 순서 모드: 분할 조합 확인
             if let lastIndex = compositionOrder.lastIndex(of: position) {
                 // 이 위치 이후에 다른 위치가 추가되었는지 확인
-                for i in (lastIndex + 1)..<compositionOrder.count {
-                    if compositionOrder[i] != position {
-                        return false
-                    }
+                for i in (lastIndex + 1)..<compositionOrder.count where compositionOrder[i] != position {
+                    return false
                 }
             }
             return true
         }
     }
-    
+
     /// 상태에 자모 추가
     public func addJamo(position: JamoPosition, state: String) {
         let isUpdate: Bool
-        
+
         switch position {
         case .choseong:
             isUpdate = choseongState != nil
@@ -98,13 +98,13 @@ public final class SyllableState {
             isUpdate = jongseongState != nil
             jongseongState = state
         }
-        
+
         // 새로운 위치인 경우에만 조합 순서에 추가
         if !isUpdate {
             compositionOrder.append(position)
         }
     }
-    
+
     /// 위치별 자모 상태 가져오기
     @inline(__always)
     public func getJamoState(for position: JamoPosition) -> String? {
@@ -114,7 +114,7 @@ public final class SyllableState {
         case .jongseong: return jongseongState
         }
     }
-    
+
     /// 위치별 자모 상태 설정
     @inline(__always)
     public func setJamoState(for position: JamoPosition, state: String?) {
@@ -124,10 +124,10 @@ public final class SyllableState {
         case .jongseong: jongseongState = state
         }
     }
-    
+
     /// 상태의 깊은 복사본 생성
     public func copy() -> SyllableState {
-        return SyllableState(
+        SyllableState(
             choseongState: choseongState,
             jungseongState: jungseongState,
             jongseongState: jongseongState,
@@ -135,7 +135,7 @@ public final class SyllableState {
             compositionOrder: compositionOrder
         )
     }
-    
+
     /// 모든 상태 초기화
     public func clear() {
         choseongState = nil
@@ -145,7 +145,6 @@ public final class SyllableState {
         compositionOrder.removeAll(keepingCapacity: true)
     }
 }
-
 
 /// 디스플레이 과정에서 조합되지 않고 남은 낱자를 전달하기 위한 클래스
 /// 이 클래스는 SyllableState와 달리 상태 이름이 아닌 표시 문자열을 포함

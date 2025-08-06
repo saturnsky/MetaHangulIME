@@ -13,27 +13,26 @@ public enum UnicodeConstants {
     public static let choseongBase: UInt32 = 0x1100
     public static let jungseongBase: UInt32 = 0x1161
     public static let jongseongBase: UInt32 = 0x11A7
-    
+
     // 한글 음절 (U+AC00-U+D7AF)
     public static let syllableBase: UInt32 = 0xAC00
-    
+
     // 개수
     public static let choseongCount: UInt32 = 19
     public static let jungseongCount: UInt32 = 21
     public static let jongseongCount: UInt32 = 28  // 종성 없음 포함
-    
+
     // 성능을 위해 파생된 상수
     public static let syllablesPerChoseong: UInt32 = jungseongCount * jongseongCount // 588
 }
 
 /// 한국어 유니코드 연산을 위한 유틸리티
-public struct UnicodeUtils {
-    
+public enum UnicodeUtils {
     /// 자모에서 호환 자모로의 매핑 테이블
     /// O(1) 조회 성능을 위해 정적 배열로 최적화
     private static let jamoToCompatibilityMap: [Character: Character] = {
         var map: [Character: Character] = [:]
-        
+
         // 초성 매핑
         map["\u{1100}"] = "\u{3131}" // ㄱ
         map["\u{1101}"] = "\u{3132}" // ㄲ
@@ -54,7 +53,7 @@ public struct UnicodeUtils {
         map["\u{1110}"] = "\u{314C}" // ㅌ
         map["\u{1111}"] = "\u{314D}" // ㅍ
         map["\u{1112}"] = "\u{314E}" // ㅎ
-        
+
         // 중성 매핑
         map["\u{1161}"] = "\u{314F}" // ㅏ
         map["\u{1162}"] = "\u{3150}" // ㅐ
@@ -78,7 +77,7 @@ public struct UnicodeUtils {
         map["\u{1174}"] = "\u{3162}" // ㅢ
         map["\u{1175}"] = "\u{3163}" // ㅣ
         map["\u{119E}"] = "\u{318D}" // ㆍ (아래아)
-        
+
         // 종성 매핑
         map["\u{11A8}"] = "\u{3131}" // ㄱ
         map["\u{11A9}"] = "\u{3132}" // ㄲ
@@ -107,22 +106,22 @@ public struct UnicodeUtils {
         map["\u{11C0}"] = "\u{314C}" // ㅌ
         map["\u{11C1}"] = "\u{314D}" // ㅍ
         map["\u{11C2}"] = "\u{314E}" // ㅎ
-        
+
         return map
     }()
-    
+
     /// 한글 자모 (U+1100-U+11FF)를 호환 자모 (U+3130-U+318F)로 변환
     /// - Parameter jamo: 변환할 자모 문자열
     /// - Returns: 변환된 호환 자모 문자열
     @inline(__always)
     public static func jamoToCompatibility(_ jamo: String) -> String {
         // 각 유니코드 스칼라를 변환하여 다중 스칼라 문자열 처리
-        return String(jamo.unicodeScalars.compactMap { scalar in
+        String(jamo.unicodeScalars.compactMap { scalar in
             let char = Character(scalar)
             return jamoToCompatibilityMap[char] ?? char
         })
     }
-    
+
     /// 문자가 한글 자모 범위에 있는지 확인
     @inline(__always)
     public static func isHangulJamo(_ char: Character) -> Bool {
@@ -130,7 +129,7 @@ public struct UnicodeUtils {
         let value = scalar.value
         return (0x1100...0x11FF).contains(value)
     }
-    
+
     /// 문자가 한글 호환 자모 범위에 있는지 확인
     @inline(__always)
     public static func isCompatibilityJamo(_ char: Character) -> Bool {
@@ -138,7 +137,7 @@ public struct UnicodeUtils {
         let value = scalar.value
         return (0x3130...0x318F).contains(value)
     }
-    
+
     /// 문자가 조합된 한글 음절인지 확인
     @inline(__always)
     public static func isHangulSyllable(_ char: Character) -> Bool {

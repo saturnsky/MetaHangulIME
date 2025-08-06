@@ -11,7 +11,7 @@ import Foundation
 public struct BackspaceResult {
     /// New state after backspace (nil means complete deletion)
     public let newState: String?
-    
+
     public init(newState: String?) {
         self.newState = newState
     }
@@ -25,9 +25,9 @@ public class BackspaceAutomaton {
     /// Transition table: current_state -> new_state (nil for deletion)
     /// Using dictionary for O(1) lookup
     private var transitionTable: [String: String?] = [:]
-    
+
     public init() {}
-    
+
     /// Add a backspace transition
     /// - Parameters:
     ///   - fromState: Current state
@@ -35,24 +35,28 @@ public class BackspaceAutomaton {
     public func addTransition(from fromState: String, to toState: String?) {
         transitionTable[fromState] = toState
     }
-    
+
     /// Process backspace for given state
     /// - Parameter currentState: Current jamo state
     /// - Returns: BackspaceResult with new state
     public func process(_ currentState: String) -> BackspaceResult {
         // If not in transition table, default to complete deletion
-        let newState = transitionTable[currentState] ?? nil
-        return BackspaceResult(newState: newState)
+        // Using if-let to properly handle String?? type from dictionary
+        if let transition = transitionTable[currentState] {
+            return BackspaceResult(newState: transition)
+        } else {
+            return BackspaceResult(newState: nil)
+        }
     }
-    
+
     /// Check if state has a backspace transition
     /// - Parameter state: State to check
     /// - Returns: true if state has a defined transition
     @inline(__always)
     public func hasTransition(for state: String) -> Bool {
-        return transitionTable[state] != nil
+        transitionTable[state] != nil
     }
-    
+
     /// Batch add transitions for performance
     /// - Parameter transitions: Dictionary of from_state -> to_state mappings
     public func addTransitions(_ transitions: [String: String?]) {
@@ -64,11 +68,11 @@ public class BackspaceAutomaton {
 
 /// Default backspace automaton with standard Korean jamo decomposition rules
 public final class DefaultBackspaceAutomaton: BackspaceAutomaton {
-    public override init() {
+    override public init() {
         super.init()
         setupDefaultTransitions()
     }
-    
+
     private func setupDefaultTransitions() {
         // Double consonants decompose to single
         addTransitions([
@@ -76,9 +80,9 @@ public final class DefaultBackspaceAutomaton: BackspaceAutomaton {
             "ㄸ": "ㄷ",
             "ㅃ": "ㅂ",
             "ㅆ": "ㅅ",
-            "ㅉ": "ㅈ"
+            "ㅉ": "ㅈ",
         ])
-        
+
         // Compound final consonants decompose
         addTransitions([
             "ㄳ": "ㄱ",
@@ -91,9 +95,9 @@ public final class DefaultBackspaceAutomaton: BackspaceAutomaton {
             "ㄾ": "ㄹ",
             "ㄿ": "ㄹ",
             "ㅀ": "ㄹ",
-            "ㅄ": "ㅂ"
+            "ㅄ": "ㅂ",
         ])
-        
+
         // Compound vowels decompose
         addTransitions([
             "ㅘ": "ㅗ",
@@ -102,9 +106,9 @@ public final class DefaultBackspaceAutomaton: BackspaceAutomaton {
             "ㅝ": "ㅜ",
             "ㅞ": "ㅝ",
             "ㅟ": "ㅜ",
-            "ㅢ": "ㅡ"
+            "ㅢ": "ㅡ",
         ])
-        
+
         // Note: Single jamo without entries will return nil (complete deletion)
     }
 }

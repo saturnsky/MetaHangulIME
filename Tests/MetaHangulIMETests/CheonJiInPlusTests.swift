@@ -1,6 +1,6 @@
 //
 //  CheonJiInPlusTests.swift
-//  MetaHangulIMETests
+//  MetaHangulIME
 //
 //  Tests for CheonJiIn Plus IME
 //
@@ -9,73 +9,72 @@ import XCTest
 @testable import MetaHangulIME
 
 final class CheonJiInPlusTests: XCTestCase {
-    
     var ime: KoreanIME?
     var capturedCommitText: String = ""
-    
+
     override func setUp() {
         super.setUp()
         capturedCommitText = ""
         ime = nil
     }
-    
+
     override func tearDown() {
         ime = nil
         super.tearDown()
     }
-    
+
     // MARK: - Basic Tests
-    
+
     func testLoadCheonJiInPlus() throws {
         // Load CheonJiIn Plus from YAML configuration
         ime = try IMEFactory.createFromPreset(.cheonJiInPlus)
         ime?.delegate = self
-        
+
         XCTAssertNotNil(ime, "IME should be loaded")
-        
+
         if let configurableIME = ime as? ConfigurableKoreanIME {
             XCTAssertEqual(configurableIME.name, "천지인 플러스")
             XCTAssertEqual(configurableIME.identifier, "cheonjiin-plus")
         }
     }
-    
+
     func testBasicInput() throws {
         let testIME = try IMEFactory.createFromPreset(.cheonJiInPlus)
         testIME.delegate = self
         ime = testIME
-        
+
         // Test "간" = ㄱ + ㅏ + ㄴ
         _ = testIME.input("q")  // ㄱ
         _ = testIME.input("1")  // ㄱ + ㅣ
         _ = testIME.input("2")  // 가
         _ = testIME.input("e")  // 간
-        
+
         _ = testIME.forceCommit()
         XCTAssertEqual(capturedCommitText, "간", "Should produce 간")
     }
-    
+
     func testDoubleConsonants() throws {
         let testIME = try IMEFactory.createFromPreset(.cheonJiInPlus)
         testIME.delegate = self
         ime = testIME
-        
+
         // Test "깐" = ㄲ + ㅏ + ㄴ (ㅋ + ㅋ = ㄲ)
         _ = testIME.input("w")  // ㅋ
         _ = testIME.input("w")  // ㄲ
         _ = testIME.input("1")  // ㄲ + ㅣ
         _ = testIME.input("2")  // 까
         _ = testIME.input("e")  // 깐
-        
+
         _ = testIME.forceCommit()
         XCTAssertEqual(capturedCommitText, "깐", "Should produce 깐")
     }
-    
+
     // Test many different commit sequences
     func testCommit() throws {
         let testIME = try IMEFactory.createFromPreset(.cheonJiInPlus)
         testIME.delegate = self
         ime = testIME
-        
+
         // Test 1
         _ = testIME.input("w")  // ㅋ
         _ = testIME.input("w")  // ㄲ
@@ -100,7 +99,7 @@ extension CheonJiInPlusTests: KoreanIMEDelegate {
     func koreanIME(_ ime: KoreanIME, didCommitText text: String) {
         capturedCommitText += text
     }
-    
+
     func koreanIME(_ ime: KoreanIME, requestBackspace: Void) {
         // Test에서는 백스페이스 요청을 무시
     }
