@@ -239,7 +239,7 @@ final class CheonJiInTests: XCTestCase {
         XCTAssertEqual(result, "?", "Comma to question failed")
 
         result = ime.input("c")  // !
-        XCTAssertEqual(result, "!", "Question to exclamation failed")
+        XCTAssertEqual(result, "", "! should auto-commit since there is no next automata transition")
 
         // Test special character doesn't interfere with Hangul
         ime.reset()

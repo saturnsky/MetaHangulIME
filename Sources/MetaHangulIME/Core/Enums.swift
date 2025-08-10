@@ -20,10 +20,23 @@ public enum OrderMode: Int {
     case freeOrder = 1   // 낱자를 어떤 순서로도 입력 가능
 }
 
-/// CommitUnit: 텍스트 입력의 커밋 단위
-public enum CommitUnit: Int {
+/// JamoCommitPolicy: 한글 자모 입력의 커밋 정책
+public enum JamoCommitPolicy: Int {
     case syllable = 0       // 완성된 음절을 자동으로 커밋
-    case explicitCommit = 1 // 수동 커밋 필요. 특수 문자 입력시는 자동 커밋
+    case explicitCommit = 1 // 수동 커밋 필요
+}
+
+/// NonJamoCommitPolicy: 비자모 문자 입력의 커밋 정책
+public enum NonJamoCommitPolicy: Int {
+    case character = 0      // 다음 문자로 넘어갈 때 자동으로 커밋
+    case explicitCommit = 1 // 수동 커밋 필요
+    case onComplete = 2     // 오토마타의 전이가 완료되면 자동 커밋
+}
+
+/// TransitionCommitPolicy: 한글↔비한글 전환 시 커밋 정책
+public enum TransitionCommitPolicy: Int {
+    case never = 0   // 전환 시 커밋하지 않음
+    case always = 1  // 전환 시 항상 커밋
 }
 
 /// DisplayMode: 불완전한 음절의 표시 모드

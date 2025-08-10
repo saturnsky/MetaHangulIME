@@ -49,9 +49,9 @@ public final class SyllableState {
         specialCharacterState == nil
     }
 
-    /// 상태가 한글 자모를 포함하고 있는지 여부
+    /// 상태가 자모를 포함하고 있는지 여부
     @inline(__always)
-    public var hasHangul: Bool {
+    public var hasJamo: Bool {
         choseongState != nil ||
         jungseongState != nil ||
         jongseongState != nil

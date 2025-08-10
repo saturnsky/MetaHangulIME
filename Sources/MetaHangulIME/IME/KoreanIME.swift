@@ -25,7 +25,7 @@ public protocol KoreanIMEDelegate: AnyObject {
 /// - 문자 입력 처리
 /// - 백스페이스 처리
 /// - 상태 관리 (이전/현재 음절)
-/// - 커밋 처리 (SYLLABLE vs EXPLICIT_COMMIT 모드)
+/// - 커밋 처리 (커밋 정책에 따른 처리)
 ///
 /// 중요: Swift 라이브러리에서의 커밋 처리
 /// ========================================
@@ -137,32 +137,15 @@ open class KoreanIME {
             inputKey: virtualKey
         )
 
-        // 자모가 아닌 문자가 입력되고 한글이 있는 경우, 먼저 커밋
-        // 자모가 아닌 문자만 있는 것이 아닌 실제 한글 텍스트가 있는 경우에만 커밋
-        let hasHangulText = (previousState?.hasHangul ?? false) || currentState.hasHangul
-        if virtualKey.isNonJamo && hasHangulText {
-            // 자모가 아닌 문자 처리 전에 현재 조합 커밋
-            performCommitAll()
-
-            // 빈 상태에서 자모가 아닌 문자를 다시 처리
-            let specialResult = processor.process(
-                previousState: previousState,
-                currentState: currentState,
-                inputKey: virtualKey
-            )
-
-            if specialResult.cursorMovement > 0 {
-                handleCursorMovement(result: specialResult)
-            } else {
-                updateStatesFromResult(specialResult)
-            }
+        // 커밋 정책에 따라 상태 업데이트 처리
+        if result.cursorMovement > 0 {
+            handleCursorMovement(result: result)
         } else {
-            // 커밋 단위에 따라 상태 업데이트 처리
-            if result.cursorMovement > 0 {
-                handleCursorMovement(result: result)
+            // 커서 이동 없음 - 입력 타입에 따라 적절한 update 함수 호출
+            if virtualKey.isNonJamo {
+                updateNonJamoStatesFromResult(result)
             } else {
-                // 커서 이동 없음
-                updateStatesFromResult(result)
+                updateJamoStatesFromResult(result)
             }
         }
 
@@ -224,7 +207,7 @@ open class KoreanIME {
     /// 조합 중인 텍스트가 있는지 확인
     /// - Returns: 커밋되지 않은 텍스트가 있으면 true
     public var hasComposingText: Bool {
-        if processor.config.commitUnit == .explicitCommit {
+        if processor.config.jamoCommitPolicy == .explicitCommit {
             return uncommittedSyllables.contains { !$0.isEmpty }
         } else {
             if let prev = previousState, !prev.isEmpty {
@@ -237,43 +220,91 @@ open class KoreanIME {
     // MARK: - Private 메서드
 
     private func handleCursorMovement(result: ProcessResult) {
-        let cursorMovement = result.cursorMovement
+        // 현재 입력이 Non-Jamo인지 확인 (현재 상태의 specialCharacterState로 판단)
+        // - 현재 상태에 specialCharacterState가 있으면 Non-Jamo 입력
+        // - 현재 상태에 jamo가 있으면 Jamo 입력
+        let isCurrentInputNonJamo: Bool
+        if result.currentState.specialCharacterState != nil {
+            isCurrentInputNonJamo = true
+        } else if result.currentState.hasJamo {
+            isCurrentInputNonJamo = false
+        } else {
+            // 빈 상태인 경우 이전 상태로 판단
+            isCurrentInputNonJamo = result.previousState?.specialCharacterState != nil
+        }
 
-        switch processor.config.commitUnit {
+        if isCurrentInputNonJamo {
+            handleNonJamoCursorMovement(result: result)
+        } else {
+            handleJamoCursorMovement(result: result)
+        }
+    }
+
+    /// Non-Jamo 입력에 대한 커서 이동 처리
+    private func handleNonJamoCursorMovement(result: ProcessResult) {
+        switch processor.config.nonJamoCommitPolicy {
+        case .character:
+            // 이전 상태 커밋
+            if let prev = result.previousState, !prev.isEmpty {
+                let text = processor.buildDisplay(prev)
+                delegate?.koreanIME(self, didCommitText: text)
+            }
+            uncommittedSyllables = [result.currentState]
+
+        case .onComplete:
+            // onComplete 모드: 오토마타 전이 완료 시 커밋
+            if let prev = result.previousState, !prev.isEmpty {
+                let text = processor.buildDisplay(prev)
+                delegate?.koreanIME(self, didCommitText: text)
+            }
+            uncommittedSyllables = [result.currentState]
+
+        case .explicitCommit:
+            // explicitCommit 모드: 수동 커밋
+            var newSyllables = uncommittedSyllables
+            if let prevState = result.previousState {
+                if newSyllables.isEmpty {
+                    newSyllables = [prevState]
+                } else {
+                    newSyllables[newSyllables.count - 1] = prevState
+                }
+            }
+            newSyllables.append(result.currentState)
+            uncommittedSyllables = newSyllables
+        }
+    }
+
+    /// Jamo 입력에 대한 커서 이동 처리 (cursorMovement > 0인 경우)
+    private func handleJamoCursorMovement(result: ProcessResult) {
+        switch processor.config.jamoCommitPolicy {
         case .syllable:
             // 이전 상태 커밋
             if let prev = result.previousState, !prev.isEmpty {
                 let text = processor.buildDisplay(prev)
                 delegate?.koreanIME(self, didCommitText: text)
             }
-            // SYLLABLE 모드에서는 이전 상태를 유지하지 않음
+            // syllable 모드에서는 이전 상태를 유지하지 않음
             uncommittedSyllables = [result.currentState]
 
         case .explicitCommit:
-            // cursorMovement에 따라 배열 크기 조정
-            if cursorMovement == 1 {
-                // 새 음절로 이동: 기존 배열 크기 + 1
-                var newSyllables = uncommittedSyllables
+            // 새 음절로 이동: 기존 배열 크기 + 1
+            var newSyllables = uncommittedSyllables
 
-                // result의 previousState가 있다면 현재 currentState 자리에 설정
-                // 없다면 기존 currentState를 그대로 유지
-                if let prevState = result.previousState {
-                    if newSyllables.isEmpty {
-                        newSyllables = [prevState]
-                    } else {
-                        newSyllables[newSyllables.count - 1] = prevState
-                    }
+            // result의 previousState가 있다면 현재 currentState 자리에 설정
+            // 없다면 기존 currentState를 그대로 유지
+            if let prevState = result.previousState {
+                if newSyllables.isEmpty {
+                    newSyllables = [prevState]
+                } else {
+                    newSyllables[newSyllables.count - 1] = prevState
                 }
-                // else: result.previousState가 nil이면 기존 currentState 유지
-
-                // result의 currentState를 새로운 음절로 추가
-                newSyllables.append(result.currentState)
-
-                uncommittedSyllables = newSyllables
-            } else {
-                // cursorMovement == 0: 현재 위치에서 상태만 업데이트
-                updateStatesFromResult(result)
             }
+            // else: result.previousState가 nil이면 기존 currentState 유지
+
+            // result의 currentState를 새로운 음절로 추가
+            newSyllables.append(result.currentState)
+
+            uncommittedSyllables = newSyllables
         }
     }
 
@@ -295,10 +326,10 @@ open class KoreanIME {
         }
     }
 
-    /// ProcessResult를 기반으로 상태 업데이트
-    private func updateStatesFromResult(_ result: ProcessResult) {
-        if processor.config.commitUnit == .explicitCommit {
-            // EXPLICIT_COMMIT 모드: 기존 배열을 보존하면서 마지막 부분만 업데이트
+    /// ProcessResult를 기반으로 Jamo 상태 업데이트
+    private func updateJamoStatesFromResult(_ result: ProcessResult) {
+        if processor.config.jamoCommitPolicy == .explicitCommit {
+            // explicitCommit 모드: 기존 배열을 보존하면서 마지막 부분만 업데이트
             var newSyllables = uncommittedSyllables
 
             // previousState와 currentState에 따라 마지막 1-2개 음절 조정
@@ -333,7 +364,7 @@ open class KoreanIME {
 
             uncommittedSyllables = newSyllables
         } else {
-            // SYLLABLE 모드: 기존 로직 유지
+            // syllable 모드
             if let prevState = result.previousState {
                 if result.currentState.isEmpty {
                     uncommittedSyllables = [prevState]
@@ -346,10 +377,65 @@ open class KoreanIME {
         }
     }
 
+    /// ProcessResult를 기반으로 Non-Jamo 상태 업데이트
+    private func updateNonJamoStatesFromResult(_ result: ProcessResult) {
+        if processor.config.nonJamoCommitPolicy == .explicitCommit {
+            // explicitCommit 모드: 기존 배열을 보존하면서 새 음절 추가
+            var newSyllables = uncommittedSyllables
+            // cursorMovement가 1이면 새 음절 추가
+            if result.cursorMovement == 1 {
+                // previousState가 있다면 현재 위치에 설정
+                if let prevState = result.previousState {
+                    if newSyllables.isEmpty {
+                        newSyllables = [prevState]
+                    } else {
+                        newSyllables[newSyllables.count - 1] = prevState
+                    }
+                }
+                // 새 음절 추가
+                newSyllables.append(result.currentState)
+            } else {
+                // cursorMovement가 0이면 현재 위치 업데이트
+                if newSyllables.isEmpty {
+                    newSyllables = [result.currentState]
+                } else {
+                    newSyllables[newSyllables.count - 1] = result.currentState
+                }
+            }
+
+            uncommittedSyllables = newSyllables
+        } else {
+            // character/onComplete 모드: 기존 로직 유지
+            if result.currentState.isEmpty {
+                uncommittedSyllables = []
+            } else {
+                uncommittedSyllables = [result.currentState]
+            }
+            if processor.config.nonJamoCommitPolicy == .onComplete && !uncommittedSyllables.isEmpty {
+                // nonJamoAutomaton.canTransitionFurther 를 통해 last에서 다음 전이가 가능한지 확인
+                // nonJamoAutomaton이 없을 경우 항상 전이가 불가능한 것으로 간주
+                // 다음 전이가 불가능할 경우 마지막 글자를 커밋하고, uncommittedSyllables를 비움
+                if let lastSyllable = uncommittedSyllables.last,
+                   let specialCharState = lastSyllable.specialCharacterState {
+                    // NonJamo 오토마타에서 현재 상태로부터 추가 전이가 가능한지 확인
+                    let canTransition = processor.canTransitionFurtherForNonJamo(from: specialCharState)
+                    if !canTransition {
+                        // 전이가 불가능하면 마지막 음절을 커밋
+                        if let lastToCommit = uncommittedSyllables.last {
+                            let displayText = processor.buildDisplay(lastToCommit)
+                            delegate?.koreanIME(self, didCommitText: displayText)
+                            uncommittedSyllables = []
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     /// BackspaceProcessResult를 기반으로 상태 업데이트
     private func updateStatesFromBackspaceResult(_ result: BackspaceProcessResult) {
-        if processor.config.commitUnit == .explicitCommit {
-            // EXPLICIT_COMMIT 모드: 기존 배열의 앞부분을 보존하고 마지막 1-2개만 교체
+        if processor.config.jamoCommitPolicy == .explicitCommit {
+            // explicitCommit 모드: 기존 배열의 앞부분을 보존하고 마지막 1-2개만 교체
             let baseCount = uncommittedSyllables.count >= 2 ? uncommittedSyllables.count - 2 : 0
             var newSyllables = Array(uncommittedSyllables.prefix(baseCount))
 
@@ -378,13 +464,9 @@ open class KoreanIME {
 
             uncommittedSyllables = newSyllables
         } else {
-            // SYLLABLE 모드: 기존 로직 유지
-            if let prevState = result.previousState {
-                if result.currentState.isEmpty {
-                    uncommittedSyllables = [prevState]
-                } else {
-                    uncommittedSyllables = [prevState, result.currentState]
-                }
+            // syllable 모드: 기존 로직 유지
+            if result.currentState.isEmpty {
+                uncommittedSyllables = []
             } else {
                 uncommittedSyllables = [result.currentState]
             }

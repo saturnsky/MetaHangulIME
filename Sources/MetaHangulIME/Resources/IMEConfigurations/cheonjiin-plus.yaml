@@ -2,7 +2,9 @@ name: "천지인 플러스"
 identifier: "cheonjiin-plus"
 config:
   orderMode: "sequential"
-  commitUnit: "explicitCommit"
+  jamoCommitPolicy: "explicitCommit"
+  nonJamoCommitPolicy: "onComplete"
+  transitionCommitPolicy: "always"
   displayMode: "modernMultiple"
   supportStandaloneCluster: true
 layout:

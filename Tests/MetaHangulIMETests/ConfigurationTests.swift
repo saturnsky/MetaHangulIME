@@ -17,7 +17,9 @@ final class ConfigurationTests: XCTestCase {
         identifier: "test-ime"
         config:
           orderMode: "sequential"
-          commitUnit: "syllable"
+          jamoCommitPolicy: "syllable"
+          nonJamoCommitPolicy: "onComplete"
+          transitionCommitPolicy: "always"
           displayMode: "modernMultiple"
           supportStandaloneCluster: false
         layout:
@@ -46,7 +48,9 @@ final class ConfigurationTests: XCTestCase {
     func testProcessorConfigConversion() throws {
         let config = ProcessorConfig(
           orderMode: "sequential",
-          commitUnit: "syllable",
+          jamoCommitPolicy: "syllable",
+          nonJamoCommitPolicy: "onComplete",
+          transitionCommitPolicy: "always",
           displayMode: "modernMultiple",
           supportStandaloneCluster: false
         )
@@ -54,7 +58,9 @@ final class ConfigurationTests: XCTestCase {
         let processorConfig = try config.toInputProcessorConfig()
 
         XCTAssertEqual(processorConfig.orderMode, .sequential)
-        XCTAssertEqual(processorConfig.commitUnit, .syllable)
+        XCTAssertEqual(processorConfig.jamoCommitPolicy, .syllable)
+        XCTAssertEqual(processorConfig.nonJamoCommitPolicy, .onComplete)
+        XCTAssertEqual(processorConfig.transitionCommitPolicy, .always)
         XCTAssertEqual(processorConfig.displayMode, .modernMultiple)
         XCTAssertFalse(processorConfig.supportStandaloneCluster)
     }
@@ -63,19 +69,25 @@ final class ConfigurationTests: XCTestCase {
         let invalidConfigs = [
             ProcessorConfig(
                 orderMode: "invalid",
-                commitUnit: "syllable",
+                jamoCommitPolicy: "syllable",
+                nonJamoCommitPolicy: "onComplete",
+                transitionCommitPolicy: "always",
                 displayMode: "modernMultiple",
                 supportStandaloneCluster: false
             ),
             ProcessorConfig(
                 orderMode: "sequential",
-                commitUnit: "invalid",
+                jamoCommitPolicy: "invalid",
+                nonJamoCommitPolicy: "onComplete",
+                transitionCommitPolicy: "always",
                 displayMode: "modernMultiple",
                 supportStandaloneCluster: false
             ),
             ProcessorConfig(
                 orderMode: "sequential",
-                commitUnit: "syllable",
+                jamoCommitPolicy: "syllable",
+                nonJamoCommitPolicy: "onComplete",
+                transitionCommitPolicy: "always",
                 displayMode: "invalid",
                 supportStandaloneCluster: false
             ),
@@ -94,7 +106,9 @@ final class ConfigurationTests: XCTestCase {
         identifier: "test"
         config:
           orderMode: "sequential"
-          commitUnit: "syllable"
+          jamoCommitPolicy: "syllable"
+          nonJamoCommitPolicy: "onComplete"
+          transitionCommitPolicy: "always"
           displayMode: "modernMultiple"
           supportStandaloneCluster: false
         layout:
@@ -127,7 +141,9 @@ final class ConfigurationTests: XCTestCase {
         identifier: "valid-ime"
         config:
           orderMode: "sequential"
-          commitUnit: "syllable"
+          jamoCommitPolicy: "syllable"
+          nonJamoCommitPolicy: "onComplete"
+          transitionCommitPolicy: "always"
           displayMode: "modernMultiple"
           supportStandaloneCluster: false
         layout:
@@ -150,7 +166,9 @@ final class ConfigurationTests: XCTestCase {
           identifier: "test"
           config:
             orderMode: "sequential"
-            commitUnit: "syllable"
+            jamoCommitPolicy: "syllable"
+          nonJamoCommitPolicy: "onComplete"
+          transitionCommitPolicy: "always"
             displayMode: "modernMultiple"
             supportStandaloneCluster: false
           layout:
@@ -166,7 +184,9 @@ final class ConfigurationTests: XCTestCase {
           identifier: "test"
           config:
             orderMode: "sequential"
-            commitUnit: "syllable"
+            jamoCommitPolicy: "syllable"
+          nonJamoCommitPolicy: "onComplete"
+          transitionCommitPolicy: "always"
             displayMode: "modernMultiple"
             supportStandaloneCluster: false
           layout: {}
@@ -181,7 +201,9 @@ final class ConfigurationTests: XCTestCase {
           identifier: "test"
           config:
             orderMode: "sequential"
-            commitUnit: "syllable"
+            jamoCommitPolicy: "syllable"
+          nonJamoCommitPolicy: "onComplete"
+          transitionCommitPolicy: "always"
             displayMode: "modernMultiple"
             supportStandaloneCluster: false
           layout:
@@ -205,7 +227,9 @@ final class ConfigurationTests: XCTestCase {
         identifier: "test-ime"
         config:
           orderMode: "sequential"
-          commitUnit: "syllable"
+          jamoCommitPolicy: "syllable"
+          nonJamoCommitPolicy: "onComplete"
+          transitionCommitPolicy: "always"
           displayMode: "modernMultiple"
           supportStandaloneCluster: false
         layout:
@@ -250,7 +274,9 @@ final class ConfigurationTests: XCTestCase {
         identifier: "complex-ime"
         config:
           orderMode: "sequential"
-          commitUnit: "explicitCommit"
+          jamoCommitPolicy: "explicitCommit"
+          nonJamoCommitPolicy: "onComplete"
+          transitionCommitPolicy: "always"
           displayMode: "modernMultiple"
           supportStandaloneCluster: true
         layout:
@@ -309,7 +335,9 @@ extension ConfigurationTests {
         identifier: "cheonjiin"
         config:
           orderMode: "sequential"
-          commitUnit: "explicitCommit"
+          jamoCommitPolicy: "explicitCommit"
+          nonJamoCommitPolicy: "onComplete"
+          transitionCommitPolicy: "always"
           displayMode: "modernMultiple"
           supportStandaloneCluster: true
         layout:

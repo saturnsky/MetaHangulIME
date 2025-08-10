@@ -19,7 +19,9 @@ public struct IMEConfiguration: Codable {
 /// 프로세서 설정
 public struct ProcessorConfig: Codable {
     public let orderMode: String
-    public let commitUnit: String
+    public let jamoCommitPolicy: String
+    public let nonJamoCommitPolicy: String
+    public let transitionCommitPolicy: String
     public let displayMode: String
     public let supportStandaloneCluster: Bool
 }
@@ -105,8 +107,16 @@ extension ProcessorConfig {
             throw ConfigurationError.invalidOrderMode(orderMode)
         }
 
-        guard let commitUnit = CommitUnit.from(string: commitUnit) else {
-            throw ConfigurationError.invalidCommitUnit(commitUnit)
+        guard let jamoCommitPolicy = JamoCommitPolicy.from(string: jamoCommitPolicy) else {
+            throw ConfigurationError.invalidJamoCommitPolicy(jamoCommitPolicy)
+        }
+
+        guard let nonJamoCommitPolicy = NonJamoCommitPolicy.from(string: nonJamoCommitPolicy) else {
+            throw ConfigurationError.invalidNonJamoCommitPolicy(nonJamoCommitPolicy)
+        }
+
+        guard let transitionCommitPolicy = TransitionCommitPolicy.from(string: transitionCommitPolicy) else {
+            throw ConfigurationError.invalidTransitionCommitPolicy(transitionCommitPolicy)
         }
 
         guard let displayMode = DisplayMode.from(string: displayMode) else {
@@ -115,7 +125,9 @@ extension ProcessorConfig {
 
         return InputProcessorConfig(
             orderMode: orderMode,
-            commitUnit: commitUnit,
+            jamoCommitPolicy: jamoCommitPolicy,
+            nonJamoCommitPolicy: nonJamoCommitPolicy,
+            transitionCommitPolicy: transitionCommitPolicy,
             displayMode: displayMode,
             supportStandaloneCluster: supportStandaloneCluster
         )
@@ -126,7 +138,9 @@ extension ProcessorConfig {
 
 public enum ConfigurationError: LocalizedError {
     case invalidOrderMode(String)
-    case invalidCommitUnit(String)
+    case invalidJamoCommitPolicy(String)
+    case invalidNonJamoCommitPolicy(String)
+    case invalidTransitionCommitPolicy(String)
     case invalidDisplayMode(String)
     case invalidYAML
     case fileNotFound(String)
@@ -135,8 +149,12 @@ public enum ConfigurationError: LocalizedError {
         switch self {
         case .invalidOrderMode(let mode):
             return "Invalid order mode: \(mode). Expected: sequential, freeOrder"
-        case .invalidCommitUnit(let unit):
-            return "Invalid commit unit: \(unit). Expected: syllable, explicitCommit"
+        case .invalidJamoCommitPolicy(let policy):
+            return "Invalid jamo commit policy: \(policy). Expected: syllable, explicitCommit"
+        case .invalidNonJamoCommitPolicy(let policy):
+            return "Invalid non-jamo commit policy: \(policy). Expected: character, explicitCommit, onComplete"
+        case .invalidTransitionCommitPolicy(let policy):
+            return "Invalid transition commit policy: \(policy). Expected: never, always"
         case .invalidDisplayMode(let mode):
             return "Invalid display mode: \(mode). Expected: archaic, modernMultiple, modernPartial"
         case .invalidYAML:
@@ -159,11 +177,32 @@ extension OrderMode {
     }
 }
 
-extension CommitUnit {
-    static func from(string: String) -> CommitUnit? {
+extension JamoCommitPolicy {
+    static func from(string: String) -> JamoCommitPolicy? {
         switch string {
         case "syllable": return .syllable
         case "explicitCommit": return .explicitCommit
+        default: return nil
+        }
+    }
+}
+
+extension NonJamoCommitPolicy {
+    static func from(string: String) -> NonJamoCommitPolicy? {
+        switch string {
+        case "character": return .character
+        case "explicitCommit": return .explicitCommit
+        case "onComplete": return .onComplete
+        default: return nil
+        }
+    }
+}
+
+extension TransitionCommitPolicy {
+    static func from(string: String) -> TransitionCommitPolicy? {
+        switch string {
+        case "never": return .never
+        case "always": return .always
         default: return nil
         }
     }

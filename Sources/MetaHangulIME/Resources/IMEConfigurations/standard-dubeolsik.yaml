@@ -4,7 +4,9 @@ identifier: "standard-dubeolsik"
 
 config:
   orderMode: "sequential"
-  commitUnit: "syllable"
+  jamoCommitPolicy: "syllable"
+  nonJamoCommitPolicy: "onComplete"
+  transitionCommitPolicy: "always"
   displayMode: "modernMultiple"
   supportStandaloneCluster: false
 

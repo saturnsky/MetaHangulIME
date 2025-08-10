@@ -70,7 +70,7 @@ public final class DisplayBuilder {
 
     /// 현대 한글로 조합할 수 없는 음절은 여러 음절로 풀어서 표시하는 메서드
     private func buildMultipleSyllables(_ state: SyllableState) -> String {
-        guard state.hasHangul else { return "" }
+        guard state.hasJamo else { return "" }
 
         var result = ""
         var cho = state.choseongState.map { choseongAutomaton.display($0) } ?? ""
@@ -99,7 +99,7 @@ public final class DisplayBuilder {
 
     /// 현대 한글로 조합할 수 있는 부분까지만 표시하는 메서드
     private func buildPartialDisplay(_ state: SyllableState) -> String {
-        guard state.hasHangul else { return "" }
+        guard state.hasJamo else { return "" }
 
         let cho = state.choseongState.map { choseongAutomaton.display($0) } ?? ""
         let jung = state.jungseongState.map { jungseongAutomaton.display($0) } ?? ""

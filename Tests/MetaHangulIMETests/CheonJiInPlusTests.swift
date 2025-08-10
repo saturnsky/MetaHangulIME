@@ -87,7 +87,8 @@ final class CheonJiInPlusTests: XCTestCase {
         XCTAssertEqual(currentText, ".", "Should have composing text '.'")
         _ = testIME.input("n")  // 깐.? 깐은 commit, .?은 조합 중
         currentText = testIME.getComposingText()
-        XCTAssertEqual(currentText, ".?", "Should have composing text '.?'")
+        XCTAssertEqual(capturedCommitText, "깐.", "Should produce 깐. after commit")
+        XCTAssertEqual(currentText, "?", "Should have composing text '.?'")
         _ = testIME.forceCommit()
         XCTAssertEqual(capturedCommitText, "깐.?", "Should produce .?")
     }

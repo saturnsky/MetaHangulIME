@@ -89,6 +89,16 @@ open class Automaton {
             addDisplay(state: state, display: display)
         }
     }
+
+    /// Check if any transition is possible from the given state
+    /// - Parameter fromState: State to check transitions from
+    /// - Returns: true if at least one transition exists from this state
+    @inline(__always)
+    public func canTransition(from fromState: String?) -> Bool {
+        let state = fromState ?? ""
+        guard let transitions = transitionTable[state] else { return false }
+        return !transitions.isEmpty
+    }
 }
 
 /// Choseong (initial consonant) automaton

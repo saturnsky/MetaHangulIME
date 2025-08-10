@@ -4,7 +4,9 @@ identifier: "cheonjiin"
 
 config:
   orderMode: "sequential"
-  commitUnit: "explicitCommit"
+  jamoCommitPolicy: "explicitCommit"
+  nonJamoCommitPolicy: "onComplete"
+  transitionCommitPolicy: "always"
   displayMode: "modernMultiple"
   supportStandaloneCluster: true
 

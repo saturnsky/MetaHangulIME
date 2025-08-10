@@ -51,7 +51,9 @@ public final class CheonJiIn: KoreanIME {
 
         let config = InputProcessorConfig(
             orderMode: .sequential,
-            commitUnit: .explicitCommit,  // 천지인은 명시적 커밋 사용
+            jamoCommitPolicy: .explicitCommit,  // 천지인은 명시적 커밋 사용
+            nonJamoCommitPolicy: .onComplete,
+            transitionCommitPolicy: .always,
             displayMode: .modernMultiple,
             supportStandaloneCluster: true  // 천지인은 종성부용초성 지원
         )

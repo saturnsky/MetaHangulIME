@@ -117,7 +117,9 @@ public final class StandardDubeolsik: KoreanIME {
 
         let config = InputProcessorConfig(
             orderMode: .sequential,
-            commitUnit: .syllable,
+            jamoCommitPolicy: .syllable,
+            nonJamoCommitPolicy: .onComplete,
+            transitionCommitPolicy: .always,
             displayMode: .modernMultiple,
             supportStandaloneCluster: false
         )
