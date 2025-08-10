@@ -141,7 +141,7 @@ public final class InputProcessor {
         }
 
         // Non-Jamo 상태가 있으면 NonJamoProcessor로 처리
-        if currentState.specialCharacterState != nil {
+        if currentState.nonJamoState != nil {
             return nonJamoProcessor.processBackspace(
                 previousState: previousState,
                 currentState: currentState

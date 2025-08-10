@@ -220,17 +220,17 @@ open class KoreanIME {
     // MARK: - Private 메서드
 
     private func handleCursorMovement(result: ProcessResult) {
-        // 현재 입력이 Non-Jamo인지 확인 (현재 상태의 specialCharacterState로 판단)
-        // - 현재 상태에 specialCharacterState가 있으면 Non-Jamo 입력
+        // 현재 입력이 Non-Jamo인지 확인 (현재 상태의 nonJamoState로 판단)
+        // - 현재 상태에 nonJamoState가 있으면 Non-Jamo 입력
         // - 현재 상태에 jamo가 있으면 Jamo 입력
         let isCurrentInputNonJamo: Bool
-        if result.currentState.specialCharacterState != nil {
+        if result.currentState.nonJamoState != nil {
             isCurrentInputNonJamo = true
         } else if result.currentState.hasJamo {
             isCurrentInputNonJamo = false
         } else {
             // 빈 상태인 경우 이전 상태로 판단
-            isCurrentInputNonJamo = result.previousState?.specialCharacterState != nil
+            isCurrentInputNonJamo = result.previousState?.nonJamoState != nil
         }
 
         if isCurrentInputNonJamo {
@@ -416,9 +416,9 @@ open class KoreanIME {
                 // nonJamoAutomaton이 없을 경우 항상 전이가 불가능한 것으로 간주
                 // 다음 전이가 불가능할 경우 마지막 글자를 커밋하고, uncommittedSyllables를 비움
                 if let lastSyllable = uncommittedSyllables.last,
-                   let specialCharState = lastSyllable.specialCharacterState {
+                   let nonJamoState = lastSyllable.nonJamoState {
                     // NonJamo 오토마타에서 현재 상태로부터 추가 전이가 가능한지 확인
-                    let canTransition = processor.canTransitionFurtherForNonJamo(from: specialCharState)
+                    let canTransition = processor.canTransitionFurtherForNonJamo(from: nonJamoState)
                     if !canTransition {
                         // 전이가 불가능하면 마지막 음절을 커밋
                         if let lastToCommit = uncommittedSyllables.last {

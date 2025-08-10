@@ -39,8 +39,8 @@ final class CheonJiInDebugTests: XCTestCase {
         if let jong = state.jongseongState {
             parts.append("jong:'\(jong)'")
         }
-        if let special = state.specialCharacterState {
-            parts.append("special:'\(special)'")
+        if let nonJamo = state.nonJamoState {
+            parts.append("nonJamo:'\(nonJamo)'")
         }
         if !state.compositionOrder.isEmpty {
             let order = state.compositionOrder.map { String($0.rawValue) }.joined(separator: ",")

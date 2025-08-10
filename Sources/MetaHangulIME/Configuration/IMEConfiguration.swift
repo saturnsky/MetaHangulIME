@@ -53,7 +53,7 @@ public struct AutomataDefinition: Codable {
     public let jongseong: AutomatonDefinition?
     public let dokkaebibul: DokkaebiDefinition?
     public let backspace: BackspaceDefinition?
-    public let specialCharacter: SpecialCharacterDefinition?
+    public let nonJamo: NonJamoDefinition?
 }
 
 /// 일반 오토마타 정의 (초성, 중성, 종성)
@@ -92,8 +92,8 @@ public struct BackspaceTransition: Codable {
     public let to: String
 }
 
-/// 특수문자 오토마타 정의
-public struct SpecialCharacterDefinition: Codable {
+/// 비자모 오토마타 정의
+public struct NonJamoDefinition: Codable {
     public let transitions: [TransitionDefinition]
     public let display: [String: String]
 }

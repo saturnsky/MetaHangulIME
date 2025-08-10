@@ -34,7 +34,7 @@ public enum IMEFactory {
         // 옵셔널 오토마타
         let dokkaebiAutomaton = configuration.automata.dokkaebibul.map { createDokkaebiAutomaton(from: $0) }
         let backspaceAutomaton = configuration.automata.backspace.map { createBackspaceAutomaton(from: $0) }
-        let nonJamoAutomaton = configuration.automata.specialCharacter.map { createNonJamoAutomaton(from: $0) }
+        let nonJamoAutomaton = configuration.automata.nonJamo.map { createNonJamoAutomaton(from: $0) }
 
         // InputProcessor 생성
         let processor = InputProcessor(
@@ -181,7 +181,7 @@ private extension IMEFactory {
         return automaton
     }
 
-    static func createNonJamoAutomaton(from definition: SpecialCharacterDefinition) -> NonJamoAutomaton {
+    static func createNonJamoAutomaton(from definition: NonJamoDefinition) -> NonJamoAutomaton {
         let automaton = NonJamoAutomaton()
 
         for transition in definition.transitions {

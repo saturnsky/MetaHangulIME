@@ -308,7 +308,7 @@ automata:
       - { from: "ㅀ", to: "ㄽ" }
       - { from: "ㅄ", to: "ㅂ" }
   
-  specialCharacter:
+  nonJamo:
     transitions:
       - { from: "", input: ".,?!", to: "." }
       - { from: ".", input: ".,?!", to: "," }

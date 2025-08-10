@@ -307,7 +307,7 @@ final class ConfigurationTests: XCTestCase {
           backspace:
             transitions:
             - { from: "ㄲ", to: "ㄱ" }
-          specialCharacter:
+          nonJamo:
             transitions:
             - { from: "", input: ".", to: "." }
             display:

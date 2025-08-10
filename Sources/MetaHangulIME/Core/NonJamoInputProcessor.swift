@@ -34,9 +34,9 @@ public final class NonJamoInputProcessor {
         if hasJamo {
             let newState = SyllableState()
             if let transitioned = nonJamoAutomaton?.transition(currentState: nil, inputKey: inputKey.keyIdentifier) {
-                newState.specialCharacterState = transitioned
+                newState.nonJamoState = transitioned
             } else {
-                newState.specialCharacterState = inputKey.keyIdentifier
+                newState.nonJamoState = inputKey.keyIdentifier
             }
             return ProcessResult(
                 previousState: currentState,
@@ -46,7 +46,7 @@ public final class NonJamoInputProcessor {
         }
 
         // 현재 상태에서 transition 시도
-        let currentSpecial = currentState.specialCharacterState
+        let currentSpecial = currentState.nonJamoState
         let newSpecialFromCurrent = nonJamoAutomaton?.transition(
             currentState: currentSpecial,
             inputKey: inputKey.keyIdentifier
@@ -60,7 +60,7 @@ public final class NonJamoInputProcessor {
 
         // Case 1: 현재 상태에서 transition 성공
         if let newSpecial = newSpecialFromCurrent {
-            currentState.specialCharacterState = newSpecial
+            currentState.nonJamoState = newSpecial
             return ProcessResult(
                 previousState: previousState,
                 currentState: currentState,
@@ -71,7 +71,7 @@ public final class NonJamoInputProcessor {
         // Case 2: 현재 상태에서 transition 실패, 빈 상태에서 transition 가능
         if let newSpecial = newSpecialFromEmpty {
             let newState = SyllableState(
-                specialCharacterState: newSpecial
+                nonJamoState: newSpecial
             )
             return ProcessResult(
                 previousState: currentState,
@@ -84,7 +84,7 @@ public final class NonJamoInputProcessor {
         // 현재 상태와 빈 상태 모두에서 transition이 불가능한 경우
         if currentSpecial == nil {
             // 빈 상태에서 입력된 경우
-            currentState.specialCharacterState = inputKey.keyIdentifier
+            currentState.nonJamoState = inputKey.keyIdentifier
             return ProcessResult(
                 previousState: previousState,
                 currentState: currentState,
@@ -93,7 +93,7 @@ public final class NonJamoInputProcessor {
         } else {
             // 현재 상태에 입력된 경우
             let newState = SyllableState(
-                specialCharacterState: inputKey.keyIdentifier
+                nonJamoState: inputKey.keyIdentifier
             )
             return ProcessResult(
                 previousState: currentState,
@@ -109,12 +109,12 @@ public final class NonJamoInputProcessor {
         currentState: SyllableState
     ) -> BackspaceProcessResult {
         // Non-Jamo 상태가 없으면 처리하지 않음
-        guard currentState.specialCharacterState != nil else {
+        guard currentState.nonJamoState != nil else {
             return BackspaceProcessResult(previousState: previousState, currentState: currentState)
         }
 
         // Non-Jamo 상태 제거
-        currentState.specialCharacterState = nil
+        currentState.nonJamoState = nil
 
         return BackspaceProcessResult(previousState: previousState, currentState: currentState)
     }

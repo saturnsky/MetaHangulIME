@@ -218,9 +218,9 @@ final class CheonJiInTests: XCTestCase {
         XCTAssertEqual(result5, "각", "갃 → 각: Failed")
     }
 
-    // MARK: - Special Character Tests
+    // MARK: - Non-Jamo Character Tests
 
-    func testSpecialCharacters() {
+    func testNonJamoCharacters() {
         // Test period cycling using 'c' key
         ime.reset()
         capturedCommitText = ""

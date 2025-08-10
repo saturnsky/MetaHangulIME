@@ -35,8 +35,8 @@ public final class DisplayBuilder {
     /// - modernMultiple 모드: 조합할 수 없는 자모를 별도 음절로 풀어서 표시
     /// - modernPartial 모드: 첫 음절에서 표시 가능한 부분까지만 표시
     public func buildDisplay(_ state: SyllableState) -> String {
-        if let specialChar = state.specialCharacterState {
-            return nonJamoAutomaton?.display(specialChar) ?? ""
+        if let nonJamo = state.nonJamoState {
+            return nonJamoAutomaton?.display(nonJamo) ?? ""
         }
 
         switch displayMode {

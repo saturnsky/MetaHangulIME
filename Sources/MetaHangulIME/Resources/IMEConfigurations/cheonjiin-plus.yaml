@@ -312,7 +312,7 @@ automata:
       - { from: "ㅀ", to: "ㄹ" }
       - { from: "ㅄ", to: "ㅂ" }
   
-  specialCharacter:
+  nonJamo:
     transitions:
       # 기본 변환
       - { from: "", input: ".,", to: "." }

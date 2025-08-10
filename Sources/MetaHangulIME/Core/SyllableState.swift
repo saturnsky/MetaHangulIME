@@ -19,8 +19,8 @@ public final class SyllableState {
     /// 현재 종성 상태
     public var jongseongState: String?
 
-    /// 한글이 아닌 입력을 위한 특수문자 상태
-    public var specialCharacterState: String?
+    /// 한글이 아닌 입력을 위한 비자모 상태
+    public var nonJamoState: String?
 
     /// 자모가 입력된 순서를 추적 (FREE_ORDER 모드용)
     /// 성능을 위해 배열 사용 (append는 평균 O(1))
@@ -30,13 +30,13 @@ public final class SyllableState {
         choseongState: String? = nil,
         jungseongState: String? = nil,
         jongseongState: String? = nil,
-        specialCharacterState: String? = nil,
+        nonJamoState: String? = nil,
         compositionOrder: [JamoPosition] = []
     ) {
         self.choseongState = choseongState
         self.jungseongState = jungseongState
         self.jongseongState = jongseongState
-        self.specialCharacterState = specialCharacterState
+        self.nonJamoState = nonJamoState
         self.compositionOrder = compositionOrder
     }
 
@@ -46,7 +46,7 @@ public final class SyllableState {
         choseongState == nil &&
         jungseongState == nil &&
         jongseongState == nil &&
-        specialCharacterState == nil
+        nonJamoState == nil
     }
 
     /// 상태가 자모를 포함하고 있는지 여부
@@ -131,7 +131,7 @@ public final class SyllableState {
             choseongState: choseongState,
             jungseongState: jungseongState,
             jongseongState: jongseongState,
-            specialCharacterState: specialCharacterState,
+            nonJamoState: nonJamoState,
             compositionOrder: compositionOrder
         )
     }
@@ -141,7 +141,7 @@ public final class SyllableState {
         choseongState = nil
         jungseongState = nil
         jongseongState = nil
-        specialCharacterState = nil
+        nonJamoState = nil
         compositionOrder.removeAll(keepingCapacity: true)
     }
 }
