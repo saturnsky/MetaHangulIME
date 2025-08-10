@@ -44,10 +44,10 @@ final class CheonJiInPlusTests: XCTestCase {
         ime = testIME
 
         // Test "간" = ㄱ + ㅏ + ㄴ
-        _ = testIME.input("q")  // ㄱ
-        _ = testIME.input("1")  // ㄱ + ㅣ
-        _ = testIME.input("2")  // 가
-        _ = testIME.input("e")  // 간
+        _ = testIME.input("ㄱ")  // ㄱ
+        _ = testIME.input("ㅣ")  // ㄱ + ㅣ
+        _ = testIME.input("ㆍ")  // 가
+        _ = testIME.input("ㄴ")  // 간
 
         _ = testIME.forceCommit()
         XCTAssertEqual(capturedCommitText, "간", "Should produce 간")
@@ -59,11 +59,11 @@ final class CheonJiInPlusTests: XCTestCase {
         ime = testIME
 
         // Test "깐" = ㄲ + ㅏ + ㄴ (ㅋ + ㅋ = ㄲ)
-        _ = testIME.input("w")  // ㅋ
-        _ = testIME.input("w")  // ㄲ
-        _ = testIME.input("1")  // ㄲ + ㅣ
-        _ = testIME.input("2")  // 까
-        _ = testIME.input("e")  // 깐
+        _ = testIME.input("ㅋ")  // ㅋ
+        _ = testIME.input("ㅋ")  // ㄲ
+        _ = testIME.input("ㅣ")  // ㄲ + ㅣ
+        _ = testIME.input("ㆍ")  // 까
+        _ = testIME.input("ㄴ")  // 깐
 
         _ = testIME.forceCommit()
         XCTAssertEqual(capturedCommitText, "깐", "Should produce 깐")
@@ -76,16 +76,16 @@ final class CheonJiInPlusTests: XCTestCase {
         ime = testIME
 
         // Test 1
-        _ = testIME.input("w")  // ㅋ
-        _ = testIME.input("w")  // ㄲ
-        _ = testIME.input("1")  // 끼
-        _ = testIME.input("2")  // 까
-        _ = testIME.input("e")  // 깐
-        _ = testIME.input("b")  // 깐. 깐은 commit, .은 조합 중
+        _ = testIME.input("ㅋ")  // ㅋ
+        _ = testIME.input("ㅋ")  // ㄲ
+        _ = testIME.input("ㅣ")  // 끼
+        _ = testIME.input("ㆍ")  // 까
+        _ = testIME.input("ㄴ")  // 깐
+        _ = testIME.input(".,")  // 깐. 깐은 commit, .은 조합 중
         XCTAssertEqual(capturedCommitText, "깐", "Should produce 깐 after commit")
         var currentText = testIME.getComposingText()
         XCTAssertEqual(currentText, ".", "Should have composing text '.'")
-        _ = testIME.input("n")  // 깐.? 깐은 commit, .?은 조합 중
+        _ = testIME.input("?!")  // 깐.? 깐은 commit, .?은 조합 중
         currentText = testIME.getComposingText()
         XCTAssertEqual(capturedCommitText, "깐.", "Should produce 깐. after commit")
         XCTAssertEqual(currentText, "?", "Should have composing text '.?'")

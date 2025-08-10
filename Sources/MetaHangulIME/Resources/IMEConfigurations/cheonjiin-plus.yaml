@@ -9,29 +9,29 @@ config:
   supportStandaloneCluster: true
 layout:
   # 모음
-  "1": { identifier: "ㅣ", label: "ㅣ" }
-  "2": { identifier: "ㆍ", label: "ㆍ" }
-  "3": { identifier: "ㅡ", label: "ㅡ" }
+  "ㅣ": { identifier: "ㅣ", label: "ㅣ" }
+  "ㆍ": { identifier: "ㆍ", label: "ㆍ" }
+  "ㅡ": { identifier: "ㅡ", label: "ㅡ" }
   
   # 자음
-  q: { identifier: "ㄱ", label: "ㄱ" }
-  w: { identifier: "ㅋ", label: "ㅋ" }
-  e: { identifier: "ㄴ", label: "ㄴ" }
-  r: { identifier: "ㄹ", label: "ㄹ" }
-  t: { identifier: "ㄷ", label: "ㄷ" }
-  y: { identifier: "ㅌ", label: "ㅌ" }
-  a: { identifier: "ㅂ", label: "ㅂ" }
-  s: { identifier: "ㅍ", label: "ㅍ" }
-  d: { identifier: "ㅅ", label: "ㅅ" }
-  f: { identifier: "ㅎ", label: "ㅎ" }
-  g: { identifier: "ㅈ", label: "ㅈ" }
-  h: { identifier: "ㅊ", label: "ㅊ" }
-  c: { identifier: "ㅇ", label: "ㅇ" }
-  v: { identifier: "ㅁ", label: "ㅁ" }
+  "ㄱ": { identifier: "ㄱ", label: "ㄱ" }
+  "ㅋ": { identifier: "ㅋ", label: "ㅋ" }
+  "ㄴ": { identifier: "ㄴ", label: "ㄴ" }
+  "ㄹ": { identifier: "ㄹ", label: "ㄹ" }
+  "ㄷ": { identifier: "ㄷ", label: "ㄷ" }
+  "ㅌ": { identifier: "ㅌ", label: "ㅌ" }
+  "ㅂ": { identifier: "ㅂ", label: "ㅂ" }
+  "ㅍ": { identifier: "ㅍ", label: "ㅍ" }
+  "ㅅ": { identifier: "ㅅ", label: "ㅅ" }
+  "ㅎ": { identifier: "ㅎ", label: "ㅎ" }
+  "ㅈ": { identifier: "ㅈ", label: "ㅈ" }
+  "ㅊ": { identifier: "ㅊ", label: "ㅊ" }
+  "ㅇ": { identifier: "ㅇ", label: "ㅇ" }
+  "ㅁ": { identifier: "ㅁ", label: "ㅁ" }
   
   # 특수문자
-  b: { identifier: ".,", label: ".,", isNonJamo: true }
-  n: { identifier: "?!", label: "?!", isNonJamo: true }
+  ".,": { identifier: ".,", label: ".,", isNonJamo: true }
+  "?!": { identifier: "?!", label: "?!", isNonJamo: true }
 
 automata:
   choseong:

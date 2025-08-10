@@ -21,21 +21,21 @@ public final class CheonJiIn: KoreanIME {
     public static func createLayout() -> [String: VirtualKey] {
         [
             // 자음
-            "q": VirtualKey(keyIdentifier: "ㄱ", label: "ㄱ"),
-            "w": VirtualKey(keyIdentifier: "ㄴ", label: "ㄴ"),
-            "e": VirtualKey(keyIdentifier: "ㄷ", label: "ㄷ"),
-            "a": VirtualKey(keyIdentifier: "ㅂ", label: "ㅂ"),
-            "s": VirtualKey(keyIdentifier: "ㅅ", label: "ㅅ"),
-            "d": VirtualKey(keyIdentifier: "ㅈ", label: "ㅈ"),
-            "x": VirtualKey(keyIdentifier: "ㅇ", label: "ㅇ"),
+            "ㄱ": VirtualKey(keyIdentifier: "ㄱ", label: "ㄱ"),
+            "ㄴ": VirtualKey(keyIdentifier: "ㄴ", label: "ㄴ"),
+            "ㄷ": VirtualKey(keyIdentifier: "ㄷ", label: "ㄷ"),
+            "ㅂ": VirtualKey(keyIdentifier: "ㅂ", label: "ㅂ"),
+            "ㅅ": VirtualKey(keyIdentifier: "ㅅ", label: "ㅅ"),
+            "ㅈ": VirtualKey(keyIdentifier: "ㅈ", label: "ㅈ"),
+            "ㅇ": VirtualKey(keyIdentifier: "ㅇ", label: "ㅇ"),
 
             // 모음
-            "1": VirtualKey(keyIdentifier: "ㅣ", label: "ㅣ"),
-            "2": VirtualKey(keyIdentifier: "ㆍ", label: "ㆍ"),
-            "3": VirtualKey(keyIdentifier: "ㅡ", label: "ㅡ"),
+            "ㅣ": VirtualKey(keyIdentifier: "ㅣ", label: "ㅣ"),
+            "ㆍ": VirtualKey(keyIdentifier: "ㆍ", label: "ㆍ"),
+            "ㅡ": VirtualKey(keyIdentifier: "ㅡ", label: "ㅡ"),
 
             // 특수문자
-            "c": VirtualKey(keyIdentifier: ".", label: ".", isNonJamo: true),
+            ".": VirtualKey(keyIdentifier: ".", label: ".", isNonJamo: true),
         ]
     }
 

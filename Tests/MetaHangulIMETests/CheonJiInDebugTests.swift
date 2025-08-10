@@ -77,17 +77,17 @@ final class CheonJiInDebugTests: XCTestCase {
         capturedCommitText = ""
 
         let steps: [(key: String, expected: String)] = [
-            ("s", "ㅅ"),
-            ("s", "ㅎ"),
-            ("1", "히"),
-            ("2", "하"),
-            ("w", "한"),
-            ("w", "할"),
-            ("e", "할ㄷ"),  // 여기서 실패
-            ("e", "핥"),
-            ("e", "핥ㄷ"),
-            ("1", "핥디"),
-            ("2", "핥다"),
+            ("ㅅ", "ㅅ"),
+            ("ㅅ", "ㅎ"),
+            ("ㅣ", "히"),
+            ("ㆍ", "하"),
+            ("ㄴ", "한"),
+            ("ㄴ", "할"),
+            ("ㄷ", "할ㄷ"),  // 여기서 실패
+            ("ㄷ", "핥"),
+            ("ㄷ", "핥ㄷ"),
+            ("ㅣ", "핥디"),
+            ("ㆍ", "핥다"),
         ]
 
         for (key, expected) in steps {
@@ -98,7 +98,7 @@ final class CheonJiInDebugTests: XCTestCase {
                 print("❌ FAILED: Expected '\(expected)' but got '\(result)'")
 
                 // 실패 케이스에 대한 추가 디버그
-                if key == "e" && expected == "할ㄷ" {
+                if key == "ㄷ" && expected == "할ㄷ" {
                     print("\n--- 할ㄷ 실패 디버깅 ---")
                     print("'ㄷ'은 '할' 뒤에 새 음절을 만들어야 함")
                     print("이전 음절은 '할'이고 현재는 'ㄷ'을 초성으로 가져야 함")
@@ -116,15 +116,15 @@ final class CheonJiInDebugTests: XCTestCase {
 
         // 문제가 되는 부분에 초점: 동ㅅ -> 동ㅎ
         let steps: [(key: String, expected: String, description: String)] = [
-            ("e", "ㄷ", "초기 ㄷ"),
-            ("2", "ㄷㆍ", "ㄷ + ㆍ"),
-            ("3", "도", "도 완성"),
-            ("x", "동", "동 완성"),
-            ("s", "동ㅅ", "동 + ㅅ 새 음절로"),
-            ("s", "동ㅎ", "ㅅ + ㅅ = ㅎ"),
-            ("1", "동히", "ㅎ + ㅣ = 히"),
-            ("2", "동하", "히 -> 하"),
-            ("1", "동해", "하 -> 해"),
+            ("ㄷ", "ㄷ", "초기 ㄷ"),
+            ("ㆍ", "ㄷㆍ", "ㄷ + ㆍ"),
+            ("ㅡ", "도", "도 완성"),
+            ("ㅇ", "동", "동 완성"),
+            ("ㅅ", "동ㅅ", "동 + ㅅ 새 음절로"),
+            ("ㅅ", "동ㅎ", "ㅅ + ㅅ = ㅎ"),
+            ("ㅣ", "동히", "ㅎ + ㅣ = 히"),
+            ("ㆍ", "동하", "히 -> 하"),
+            ("ㅣ", "동해", "하 -> 해"),
         ]
 
         for (key, expected, description) in steps {
@@ -136,7 +136,7 @@ final class CheonJiInDebugTests: XCTestCase {
                 print("❌ FAILED: Expected '\(expected)' but got '\(result)'")
 
                 // ㅅ + ㅅ = ㅎ 전이에 대한 특별 디버깅
-                if key == "s" && expected == "동ㅎ" && result == "동ㅅㅅ" {
+                if key == "ㅅ" && expected == "동ㅎ" && result == "동ㅅㅅ" {
                     print("\n--- ㅅ + ㅅ = ㅎ 실패 디버깅 ---")
                     print("두 번째 ㅅ는 첫 번째 ㅅ과 결합하여 ㅎ을 만들어야 함")
                     print("이는 초성 오토마타 전이가 작동하지 않음을 시사")
@@ -154,30 +154,30 @@ final class CheonJiInDebugTests: XCTestCase {
 
         // ㄴㅅ -> ㄵ 테스트
         print("\n--- ㄴㅅ -> ㄵ 테스트 ---")
-        _ = ime.input("w")  // ㄴ
-        _ = ime.input("1")  // 니
-        _ = ime.input("2")  // 나
-        _ = ime.input("w")  // 난
-        let result1 = ime.input("s")  // 난ㅅ (중간 상태)
-        printStateTransition(key: "s", result: result1, expected: "난ㅅ")
+        _ = ime.input("ㄴ")  // ㄴ
+        _ = ime.input("ㅣ")  // 니
+        _ = ime.input("ㆍ")  // 나
+        _ = ime.input("ㄴ")  // 난
+        let result1 = ime.input("ㅅ")  // 난ㅅ (중간 상태)
+        printStateTransition(key: "ㅅ", result: result1, expected: "난ㅅ")
 
-        let result2 = ime.input("s")  // 낳이 되어야 함 (ㄴ + ㅅ + ㅅ = ㄵ)
-        printStateTransition(key: "s", result: result2, expected: "낳")
+        let result2 = ime.input("ㅅ")  // 낳이 되어야 함 (ㄴ + ㅅ + ㅅ = ㄵ)
+        printStateTransition(key: "ㅅ", result: result2, expected: "낳")
 
         // ㄹㅇ -> ㄻ 테스트
         print("\n--- ㄹㅇ -> ㄻ 테스트 ---")
         ime.reset()
-        _ = ime.input("w")  // ㄴ
-        _ = ime.input("w")  // ㄹ
-        _ = ime.input("1")  // 리
-        _ = ime.input("2")  // 라
-        _ = ime.input("w")  // 란
-        _ = ime.input("w")  // 랄
-        let result3 = ime.input("x")  // 랄ㅇ (중간 상태)
-        printStateTransition(key: "x", result: result3, expected: "랄ㅇ")
+        _ = ime.input("ㄴ")  // ㄴ
+        _ = ime.input("ㄴ")  // ㄹ
+        _ = ime.input("ㅣ")  // 리
+        _ = ime.input("ㆍ")  // 라
+        _ = ime.input("ㄴ")  // 란
+        _ = ime.input("ㄴ")  // 랄
+        let result3 = ime.input("ㅇ")  // 랄ㅇ (중간 상태)
+        printStateTransition(key: "ㅇ", result: result3, expected: "랄ㅇ")
 
-        let result4 = ime.input("x")  // 랆이 되어야 함 (ㄹ + ㅇ + ㅇ = ㄻ)
-        printStateTransition(key: "x", result: result4, expected: "랆")
+        let result4 = ime.input("ㅇ")  // 랆이 되어야 함 (ㄹ + ㅇ + ㅇ = ㄻ)
+        printStateTransition(key: "ㅇ", result: result4, expected: "랆")
     }
 
     func testBackspaceDebug() {
@@ -185,24 +185,24 @@ final class CheonJiInDebugTests: XCTestCase {
 
         // 괴를 단계별로 구성
         ime.reset()
-        let r1 = ime.input("q")  // ㄱ
+        let r1 = ime.input("ㄱ")  // ㄱ
         print("After 'q': '\(r1)'")
         print("State: \(stateDescription(ime.currentState))")
 
-        let r2 = ime.input("2")  // ㄱㆍ
+        let r2 = ime.input("ㆍ")  // ㄱㆍ
         print("\nAfter '2': '\(r2)'")
         print("State: \(stateDescription(ime.currentState))")
 
-        let r3 = ime.input("3")  // 고 (ㆍ + ㅡ = ㅗ)
+        let r3 = ime.input("ㅡ")  // 고 (ㆍ + ㅡ = ㅗ)
         print("\nAfter '3': '\(r3)'")
         print("State: \(stateDescription(ime.currentState))")
 
-        let r4 = ime.input("1")  // 괴 (ㅗ + ㅣ = ㅚ)
+        let r4 = ime.input("ㅣ")  // 괴 (ㅗ + ㅣ = ㅚ)
         print("\nAfter '1': '\(r4)'")
         print("State: \(stateDescription(ime.currentState))")
 
         // 이제 ㆍ 추가
-        let r5 = ime.input("2")  // 과가 되어야 함 (ㅒ + ㆍ = ㅘ)
+        let r5 = ime.input("ㆍ")  // 과가 되어야 함 (ㅒ + ㆍ = ㅘ)
         print("\n=== 괴에 ㆍ 추가 ===")
         print("결과: '\(r5)' (예상: '과')")
         print("Previous: \(stateDescription(ime.previousState))")
@@ -220,39 +220,39 @@ final class CheonJiInDebugTests: XCTestCase {
         ime.reset()
 
         // 동해물 구성
-        _ = ime.input("e")  // ㄷ
-        _ = ime.input("2")  // ㄷㆍ
-        _ = ime.input("3")  // 도
-        _ = ime.input("x")  // 동
+        _ = ime.input("ㄷ")  // ㄷ
+        _ = ime.input("ㆍ")  // ㄷㆍ
+        _ = ime.input("ㅡ")  // 도
+        _ = ime.input("ㅇ")  // 동
         print("동 후:")
         print("  이전: \(stateDescription(ime.previousState))")
         print("  현재: \(stateDescription(ime.currentState))")
 
-        _ = ime.input("s")  // 동ㅅ
-        _ = ime.input("s")  // 동ㅎ
-        _ = ime.input("1")  // 동히
-        _ = ime.input("2")  // 동하
-        _ = ime.input("1")  // 동해
+        _ = ime.input("ㅅ")  // 동ㅅ
+        _ = ime.input("ㅅ")  // 동ㅎ
+        _ = ime.input("ㅣ")  // 동히
+        _ = ime.input("ㆍ")  // 동하
+        _ = ime.input("ㅣ")  // 동해
         print("\n동해 후:")
         print("  이전: \(stateDescription(ime.previousState))")
         print("  현재: \(stateDescription(ime.currentState))")
 
-        _ = ime.input("x")  // 동행
-        _ = ime.input("x")  // 동햄
-        _ = ime.input("3")  // 동해므
-        _ = ime.input("2")  // 동해무
-        _ = ime.input("w")  // 동해문
-        let mul = ime.input("w")  // 동해물
+        _ = ime.input("ㅇ")  // 동행
+        _ = ime.input("ㅇ")  // 동햄
+        _ = ime.input("ㅡ")  // 동해므
+        _ = ime.input("ㆍ")  // 동해무
+        _ = ime.input("ㄴ")  // 동해문
+        let mul = ime.input("ㄴ")  // 동해물
         print("\n동해물 후: '\(mul)'")
         print("  이전: \(stateDescription(ime.previousState))")
         print("  현재: \(stateDescription(ime.currentState))")
 
         // 이제 과 추가
-        _ = ime.input("q")  // 동해묽
-        _ = ime.input("2")  // 동해물ㄱㆍ
-        _ = ime.input("3")  // 동해물고
-        _ = ime.input("1")  // 동해물괴
-        let gwa = ime.input("2")  // 동해물과
+        _ = ime.input("ㄱ")  // 동해묽
+        _ = ime.input("ㆍ")  // 동해물ㄱㆍ
+        _ = ime.input("ㅡ")  // 동해물고
+        _ = ime.input("ㅣ")  // 동해물괴
+        let gwa = ime.input("ㆍ")  // 동해물과
         print("\n동해물과 후: '\(gwa)'")
         print("  이전: \(stateDescription(ime.previousState))")
         print("  현재: \(stateDescription(ime.currentState))")

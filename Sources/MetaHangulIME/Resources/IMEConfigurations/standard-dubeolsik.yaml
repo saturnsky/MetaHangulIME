@@ -12,41 +12,41 @@ config:
 
 layout:
   # 자음
-  r: { identifier: "ㄱ", label: "ㄱ" }
-  R: { identifier: "ㄲ", label: "ㄲ" }
-  s: { identifier: "ㄴ", label: "ㄴ" }
-  e: { identifier: "ㄷ", label: "ㄷ" }
-  E: { identifier: "ㄸ", label: "ㄸ" }
-  f: { identifier: "ㄹ", label: "ㄹ" }
-  a: { identifier: "ㅁ", label: "ㅁ" }
-  q: { identifier: "ㅂ", label: "ㅂ" }
-  Q: { identifier: "ㅃ", label: "ㅃ" }
-  t: { identifier: "ㅅ", label: "ㅅ" }
-  T: { identifier: "ㅆ", label: "ㅆ" }
-  d: { identifier: "ㅇ", label: "ㅇ" }
-  w: { identifier: "ㅈ", label: "ㅈ" }
-  W: { identifier: "ㅉ", label: "ㅉ" }
-  c: { identifier: "ㅊ", label: "ㅊ" }
-  z: { identifier: "ㅋ", label: "ㅋ" }
-  x: { identifier: "ㅌ", label: "ㅌ" }
-  v: { identifier: "ㅍ", label: "ㅍ" }
-  g: { identifier: "ㅎ", label: "ㅎ" }
+  "ㄱ": { identifier: "ㄱ", label: "ㄱ" }
+  "ㄲ": { identifier: "ㄲ", label: "ㄲ" }
+  "ㄴ": { identifier: "ㄴ", label: "ㄴ" }
+  "ㄷ": { identifier: "ㄷ", label: "ㄷ" }
+  "ㄸ": { identifier: "ㄸ", label: "ㄸ" }
+  "ㄹ": { identifier: "ㄹ", label: "ㄹ" }
+  "ㅁ": { identifier: "ㅁ", label: "ㅁ" }
+  "ㅂ": { identifier: "ㅂ", label: "ㅂ" }
+  "ㅃ": { identifier: "ㅃ", label: "ㅃ" }
+  "ㅅ": { identifier: "ㅅ", label: "ㅅ" }
+  "ㅆ": { identifier: "ㅆ", label: "ㅆ" }
+  "ㅇ": { identifier: "ㅇ", label: "ㅇ" }
+  "ㅈ": { identifier: "ㅈ", label: "ㅈ" }
+  "ㅉ": { identifier: "ㅉ", label: "ㅉ" }
+  "ㅊ": { identifier: "ㅊ", label: "ㅊ" }
+  "ㅋ": { identifier: "ㅋ", label: "ㅋ" }
+  "ㅌ": { identifier: "ㅌ", label: "ㅌ" }
+  "ㅍ": { identifier: "ㅍ", label: "ㅍ" }
+  "ㅎ": { identifier: "ㅎ", label: "ㅎ" }
   
   # 모음
-  k: { identifier: "ㅏ", label: "ㅏ" }
-  o: { identifier: "ㅐ", label: "ㅐ" }
-  i: { identifier: "ㅑ", label: "ㅑ" }
-  O: { identifier: "ㅒ", label: "ㅒ" }
-  j: { identifier: "ㅓ", label: "ㅓ" }
-  p: { identifier: "ㅔ", label: "ㅔ" }
-  u: { identifier: "ㅕ", label: "ㅕ" }
-  P: { identifier: "ㅖ", label: "ㅖ" }
-  h: { identifier: "ㅗ", label: "ㅗ" }
-  y: { identifier: "ㅛ", label: "ㅛ" }
-  n: { identifier: "ㅜ", label: "ㅜ" }
-  b: { identifier: "ㅠ", label: "ㅠ" }
-  m: { identifier: "ㅡ", label: "ㅡ" }
-  l: { identifier: "ㅣ", label: "ㅣ" }
+  "ㅏ": { identifier: "ㅏ", label: "ㅏ" }
+  "ㅐ": { identifier: "ㅐ", label: "ㅐ" }
+  "ㅑ": { identifier: "ㅑ", label: "ㅑ" }
+  "ㅒ": { identifier: "ㅒ", label: "ㅒ" }
+  "ㅓ": { identifier: "ㅓ", label: "ㅓ" }
+  "ㅔ": { identifier: "ㅔ", label: "ㅔ" }
+  "ㅕ": { identifier: "ㅕ", label: "ㅕ" }
+  "ㅖ": { identifier: "ㅖ", label: "ㅖ" }
+  "ㅗ": { identifier: "ㅗ", label: "ㅗ" }
+  "ㅛ": { identifier: "ㅛ", label: "ㅛ" }
+  "ㅜ": { identifier: "ㅜ", label: "ㅜ" }
+  "ㅠ": { identifier: "ㅠ", label: "ㅠ" }
+  "ㅡ": { identifier: "ㅡ", label: "ㅡ" }
+  "ㅣ": { identifier: "ㅣ", label: "ㅣ" }
 
 automata:
   choseong:

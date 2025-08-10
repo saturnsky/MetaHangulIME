@@ -28,11 +28,11 @@ final class StandardDubeolsikTests: XCTestCase {
 
     func testBasicSyllables() {
         let tests: [(keys: [String], expected: String, description: String)] = [
-            (["r", "k", "s"], "간", "간"),
-            (["g", "k", "s"], "한", "한"),
-            (["r", "m", "f"], "글", "글"),
-            (["d", "j"], "어", "어"),
-            (["a", "o", "s"], "맨", "맨"),
+            (["ㄱ", "ㅏ", "ㄴ"], "간", "간"),
+            (["ㅎ", "ㅏ", "ㄴ"], "한", "한"),
+            (["ㄱ", "ㅡ", "ㄹ"], "글", "글"),
+            (["ㅇ", "ㅓ"], "어", "어"),
+            (["ㅁ", "ㅐ", "ㄴ"], "맨", "맨"),
         ]
 
         for test in tests {
@@ -55,13 +55,13 @@ final class StandardDubeolsikTests: XCTestCase {
 
     func testCompoundVowels() {
         let tests: [(keys: [String], expected: String, description: String)] = [
-            (["r", "h", "k"], "과", "과"),
-            (["r", "h", "o"], "괘", "괘"),
-            (["r", "h", "l"], "괴", "괴"),
-            (["r", "n", "j"], "궈", "궈"),
-            (["r", "n", "p"], "궤", "궤"),
-            (["r", "n", "l"], "귀", "귀"),
-            (["r", "m", "l"], "긔", "긔"),
+            (["ㄱ", "ㅗ", "ㅏ"], "과", "과"),
+            (["ㄱ", "ㅗ", "ㅐ"], "괘", "괘"),
+            (["ㄱ", "ㅗ", "ㅣ"], "괴", "괴"),
+            (["ㄱ", "ㅜ", "ㅓ"], "궈", "궈"),
+            (["ㄱ", "ㅜ", "ㅔ"], "궤", "궤"),
+            (["ㄱ", "ㅜ", "ㅣ"], "귀", "귀"),
+            (["ㄱ", "ㅡ", "ㅣ"], "긔", "긔"),
         ]
 
         for test in tests {
@@ -84,17 +84,17 @@ final class StandardDubeolsikTests: XCTestCase {
 
     func testCompoundConsonants() {
         let tests: [(keys: [String], expected: String, description: String)] = [
-            (["r", "k", "r", "t"], "갃", "갃"),
-            (["s", "o", "r"], "낵", "낵"),
-            (["s", "o", "R"], "낶", "낶"),
-            (["e", "k", "f", "r"], "닭", "닭"),
-            (["e", "k", "f", "a"], "닮", "닮"),
-            (["e", "k", "f", "q"], "닯", "닯"),
-            (["e", "k", "f", "t"], "닰", "닰"),
-            (["e", "k", "f", "x"], "닱", "닱"),
-            (["e", "k", "f", "v"], "닲", "닲"),
-            (["e", "k", "f", "g"], "닳", "닳"),
-            (["r", "k", "q", "t"], "값", "값"),
+            (["ㄱ", "ㅏ", "ㄱ", "ㅅ"], "갃", "갃"),
+            (["ㄴ", "ㅐ", "ㄱ"], "낵", "낵"),
+            (["ㄴ", "ㅐ", "ㄲ"], "낶", "낶"),
+            (["ㄷ", "ㅏ", "ㄹ", "ㄱ"], "닭", "닭"),
+            (["ㄷ", "ㅏ", "ㄹ", "ㅁ"], "닮", "닮"),
+            (["ㄷ", "ㅏ", "ㄹ", "ㅂ"], "닯", "닯"),
+            (["ㄷ", "ㅏ", "ㄹ", "ㅅ"], "닰", "닰"),
+            (["ㄷ", "ㅏ", "ㄹ", "ㅌ"], "닱", "닱"),
+            (["ㄷ", "ㅏ", "ㄹ", "ㅍ"], "닲", "닲"),
+            (["ㄷ", "ㅏ", "ㄹ", "ㅎ"], "닳", "닳"),
+            (["ㄱ", "ㅏ", "ㅂ", "ㅅ"], "값", "값"),
         ]
 
         for test in tests {
@@ -118,16 +118,16 @@ final class StandardDubeolsikTests: XCTestCase {
     func testDokkaebiPhenomenon() {
         let tests: [(keys: [String], expected: String, description: String)] = [
             // Simple dokkaebi
-            (["r", "k", "r", "l"], "가기", "가기 (ㄱ+ㅏ+ㄱ → ㄱ+ㅏ / ㄱ+ㅣ)"),
-            (["r", "k", "s", "l"], "가니", "가니 (ㄱ+ㅏ+ㄴ → ㄱ+ㅏ / ㄴ+ㅣ)"),
+            (["ㄱ", "ㅏ", "ㄱ", "ㅣ"], "가기", "가기 (ㄱ+ㅏ+ㄱ → ㄱ+ㅏ / ㄱ+ㅣ)"),
+            (["ㄱ", "ㅏ", "ㄴ", "ㅣ"], "가니", "가니 (ㄱ+ㅏ+ㄴ → ㄱ+ㅏ / ㄴ+ㅣ)"),
 
             // Compound consonant dokkaebi
-            (["r", "k", "r", "t", "l"], "각시", "각시 (ㄱ+ㅏ+ㄳ → ㄱ+ㅏ+ㄱ / ㅅ+ㅣ)"),
-            (["e", "k", "f", "r", "l"], "달기", "달기 (ㄷ+ㅏ+ㄺ → ㄷ+ㅏ+ㄹ / ㄱ+ㅣ)"),
-            (["e", "k", "f", "a", "l"], "달미", "달미 (ㄷ+ㅏ+ㄻ → ㄷ+ㅏ+ㄹ / ㅁ+ㅣ)"),
+            (["ㄱ", "ㅏ", "ㄱ", "ㅅ", "ㅣ"], "각시", "각시 (ㄱ+ㅏ+ㄳ → ㄱ+ㅏ+ㄱ / ㅅ+ㅣ)"),
+            (["ㄷ", "ㅏ", "ㄹ", "ㄱ", "ㅣ"], "달기", "달기 (ㄷ+ㅏ+ㄺ → ㄷ+ㅏ+ㄹ / ㄱ+ㅣ)"),
+            (["ㄷ", "ㅏ", "ㄹ", "ㅁ", "ㅣ"], "달미", "달미 (ㄷ+ㅏ+ㄻ → ㄷ+ㅏ+ㄹ / ㅁ+ㅣ)"),
 
             // No dokkaebi when jongseong can combine
-            (["r", "k", "s", "w"], "갅", "갅 (ㄱ+ㅏ+ㄴ+ㅈ → ㄱ+ㅏ+ㄵ)"),
+            (["ㄱ", "ㅏ", "ㄴ", "ㅈ"], "갅", "갅 (ㄱ+ㅏ+ㄴ+ㅈ → ㄱ+ㅏ+ㄵ)"),
         ]
 
         for test in tests {
@@ -153,9 +153,9 @@ final class StandardDubeolsikTests: XCTestCase {
         ime.reset()
         capturedCommitText = ""
 
-        _ = ime.input("r")  // ㄱ
-        _ = ime.input("k")  // 가
-        _ = ime.input("s")  // 간
+        _ = ime.input("ㄱ")  // ㄱ
+        _ = ime.input("ㅏ")  // 가
+        _ = ime.input("ㄴ")  // 간
         var result = ime.backspace()  // Should be 가
 
         XCTAssertEqual(result, "가", "Simple backspace failed")
@@ -164,11 +164,11 @@ final class StandardDubeolsikTests: XCTestCase {
         ime.reset()
         capturedCommitText = ""
 
-        _ = ime.input("r")  // ㄱ
-        _ = ime.input("k")  // 가
-        _ = ime.input("r")  // 각
-        _ = ime.input("t")  // 갃
-        _ = ime.input("l")  // 각시 (dokkaebi)
+        _ = ime.input("ㄱ")  // ㄱ
+        _ = ime.input("ㅏ")  // 가
+        _ = ime.input("ㄱ")  // 각
+        _ = ime.input("ㅅ")  // 갃
+        _ = ime.input("ㅣ")  // 각시 (dokkaebi)
         result = ime.backspace()  // Should backspace 시 -> 각ㅅ
 
         _ = ime.forceCommit()
@@ -179,9 +179,9 @@ final class StandardDubeolsikTests: XCTestCase {
         ime.reset()
         capturedCommitText = ""
 
-        _ = ime.input("g")  // ㅎ
-        _ = ime.input("k")  // 하
-        _ = ime.input("s")  // 한
+        _ = ime.input("ㅎ")  // ㅎ
+        _ = ime.input("ㅏ")  // 하
+        _ = ime.input("ㄴ")  // 한
         _ = ime.backspace()  // 하
         _ = ime.backspace()  // ㅎ
         result = ime.backspace()  // empty
@@ -195,8 +195,8 @@ final class StandardDubeolsikTests: XCTestCase {
         ime.reset()
         capturedCommitText = ""
 
-        _ = ime.input("r")  // ㄱ
-        _ = ime.input("k")  // 가
+        _ = ime.input("ㄱ")  // ㄱ
+        _ = ime.input("ㅏ")  // 가
         _ = ime.input("1")  // Should commit 가 and then 1
 
         XCTAssertEqual(capturedCommitText, "가", "Non-Hangul input handling failed")
@@ -211,16 +211,16 @@ final class StandardDubeolsikTests: XCTestCase {
         capturedCommitText = ""
 
         // Type "한글" (한 + 글)
-        _ = ime.input("g")  // ㅎ
-        _ = ime.input("k")  // 하
-        _ = ime.input("s")  // 한
-        let result1 = ime.input("r")  // 한 committed, ㄱ
+        _ = ime.input("ㅎ")  // ㅎ
+        _ = ime.input("ㅏ")  // 하
+        _ = ime.input("ㄴ")  // 한
+        let result1 = ime.input("ㄱ")  // 한 committed, ㄱ
 
         XCTAssertEqual(capturedCommitText, "한", "First syllable not committed")
         XCTAssertEqual(result1, "ㄱ", "Second syllable initial not correct")
 
-        _ = ime.input("m")  // 그
-        _ = ime.input("f")  // 글
+        _ = ime.input("ㅡ")  // 그
+        _ = ime.input("ㄹ")  // 글
 
         _ = ime.forceCommit()
         let finalText = capturedCommitText
@@ -234,24 +234,24 @@ final class StandardDubeolsikTests: XCTestCase {
         capturedCommitText = ""
 
         // Type "한글" (한 + 글)
-        _ = ime.input("g")  // ㅎ
-        _ = ime.input("k")  // 하
-        _ = ime.input("s")  // 한
-        _ = ime.input("r")  // ㄱ
-        _ = ime.input("m")  // 그
-        _ = ime.input("f")  // 글
+        _ = ime.input("ㅎ")  // ㅎ
+        _ = ime.input("ㅏ")  // 하
+        _ = ime.input("ㄴ")  // 한
+        _ = ime.input("ㄱ")  // ㄱ
+        _ = ime.input("ㅡ")  // 그
+        _ = ime.input("ㄹ")  // 글
 
         XCTAssertEqual(capturedCommitText, "한", "Commit failed")
 
-        _ = ime.input("r") // ㄱ
+        _ = ime.input("ㄱ") // ㄱ
 
         XCTAssertEqual(capturedCommitText, "한", "Commit failed")
 
-        _ = ime.input("h") // 고
+        _ = ime.input("ㅗ") // 고
 
         XCTAssertEqual(capturedCommitText, "한글", "Commit failed")
 
-        _ = ime.input("k") // 과
+        _ = ime.input("ㅏ") // 과
 
         XCTAssertEqual(capturedCommitText, "한글", "Commit failed")
 

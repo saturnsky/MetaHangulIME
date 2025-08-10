@@ -19,9 +19,9 @@ final class YAMLLoadedIMETests: XCTestCase {
 
         // 기본 음절: 긱
         capturedCommitText = ""
-        _ = ime.input("q")  // ㄱ
-        _ = ime.input("1")  // ㅣ
-        _ = ime.input("q")  // ㄱ
+        _ = ime.input("ㄱ")  // ㄱ
+        _ = ime.input("ㅣ")  // ㅣ
+        _ = ime.input("ㄱ")  // ㄱ
         _ = ime.forceCommit()
         XCTAssertEqual(capturedCommitText, "긱")
 
@@ -29,16 +29,16 @@ final class YAMLLoadedIMETests: XCTestCase {
         ime.reset()
         capturedCommitText = ""
         // 한
-        _ = ime.input("s")  // ㅅ
-        _ = ime.input("s")  // ㅎ
-        _ = ime.input("1")  // ㅣ
-        _ = ime.input("2")  // ㅏ
-        _ = ime.input("w")  // ㄴ
+        _ = ime.input("ㅅ")  // ㅅ
+        _ = ime.input("ㅅ")  // ㅎ
+        _ = ime.input("ㅣ")  // ㅣ
+        _ = ime.input("ㆍ")  // ㅏ
+        _ = ime.input("ㄴ")  // ㄴ
         // 글
-        _ = ime.input("q")  // ㄱ
-        _ = ime.input("3")  // ㅡ
-        _ = ime.input("w")  // ㄴ
-        _ = ime.input("w")  // ㄹ
+        _ = ime.input("ㄱ")  // ㄱ
+        _ = ime.input("ㅡ")  // ㅡ
+        _ = ime.input("ㄴ")  // ㄴ
+        _ = ime.input("ㄴ")  // ㄹ
         _ = ime.forceCommit()
         XCTAssertEqual(capturedCommitText, "한글")
     }
@@ -49,15 +49,15 @@ final class YAMLLoadedIMETests: XCTestCase {
 
         let tests: [(keys: [String], expected: String, desc: String)] = [
             // ㄱ + ㄱ = ㅋ
-            (["q", "q", "1"], "키", "ㅋ"),
+            (["ㄱ", "ㄱ", "ㅣ"], "키", "ㅋ"),
             // ㅋ + ㄱ = ㄲ
-            (["q", "q", "q", "1"], "끼", "ㄲ"),
+            (["ㄱ", "ㄱ", "ㄱ", "ㅣ"], "끼", "ㄲ"),
             // ㄴ + ㄴ = ㄹ
-            (["w", "w", "1"], "리", "ㄹ"),
+            (["ㄴ", "ㄴ", "ㅣ"], "리", "ㄹ"),
             // ㅅ + ㅅ = ㅎ, ㅎ + ㅅ = ㅆ
-            (["s", "s", "s", "1"], "씨", "ㅆ"),
+            (["ㅅ", "ㅅ", "ㅅ", "ㅣ"], "씨", "ㅆ"),
             // ㅇ + ㅇ = ㅁ
-            (["x", "x", "1"], "미", "ㅁ"),
+            (["ㅇ", "ㅇ", "ㅣ"], "미", "ㅁ"),
         ]
 
         for test in tests {
@@ -79,18 +79,18 @@ final class YAMLLoadedIMETests: XCTestCase {
 
         let tests: [(keys: [String], expected: String, desc: String)] = [
             // ㅣ + ㆍ = ㅏ
-            (["q", "1", "2"], "가", "ㅏ"),
+            (["ㄱ", "ㅣ", "ㆍ"], "가", "ㅏ"),
             // ㅏ + ㆍ = ㅑ
-            (["q", "1", "2", "2"], "갸", "ㅑ"),
+            (["ㄱ", "ㅣ", "ㆍ", "ㆍ"], "갸", "ㅑ"),
             // ㆍ + ㅣ = ㅓ
-            (["q", "2", "1"], "거", "ㅓ"),
+            (["ㄱ", "ㆍ", "ㅣ"], "거", "ㅓ"),
             // ㅡ + ㅣ = ㅢ
-            (["q", "3", "1"], "긔", "ㅢ"),
+            (["ㄱ", "ㅡ", "ㅣ"], "긔", "ㅢ"),
             // ㅜ + ㆍ = ㅠ
-            (["q", "3", "2", "2"], "규", "ㅠ"),
+            (["ㄱ", "ㅡ", "ㆍ", "ㆍ"], "규", "ㅠ"),
             // 합성 모음
-            (["q", "2", "3"], "고", "ㅗ"),
-            (["q", "2", "3", "1"], "괴", "ㅚ"),
+            (["ㄱ", "ㆍ", "ㅡ"], "고", "ㅗ"),
+            (["ㄱ", "ㆍ", "ㅡ", "ㅣ"], "괴", "ㅚ"),
         ]
 
         for test in tests {
@@ -114,18 +114,18 @@ final class YAMLLoadedIMETests: XCTestCase {
 
         // 한글 입력: 안녕하세요
         capturedCommitText = ""
-        _ = ime.input("d")  // ㅇ
-        _ = ime.input("k")  // ㅏ
-        _ = ime.input("s")  // ㄴ
-        _ = ime.input("s")  // ㄴ (새 음절)
-        _ = ime.input("u")  // ㅕ
-        _ = ime.input("d")  // ㅇ
-        _ = ime.input("g")  // ㅎ
-        _ = ime.input("k")  // ㅏ
-        _ = ime.input("t")  // ㅅ
-        _ = ime.input("p")  // ㅔ
-        _ = ime.input("d")  // ㅇ
-        _ = ime.input("y")  // ㅛ
+        _ = ime.input("ㅇ")  // ㅇ
+        _ = ime.input("ㅏ")  // ㅏ
+        _ = ime.input("ㄴ")  // ㄴ
+        _ = ime.input("ㄴ")  // ㄴ (새 음절)
+        _ = ime.input("ㅕ")  // ㅕ
+        _ = ime.input("ㅇ")  // ㅇ
+        _ = ime.input("ㅎ")  // ㅎ
+        _ = ime.input("ㅏ")  // ㅏ
+        _ = ime.input("ㅅ")  // ㅅ
+        _ = ime.input("ㅔ")  // ㅔ
+        _ = ime.input("ㅇ")  // ㅇ
+        _ = ime.input("ㅛ")  // ㅛ
         _ = ime.forceCommit()
         XCTAssertEqual(capturedCommitText, "안녕하세요")
     }
@@ -136,15 +136,15 @@ final class YAMLLoadedIMETests: XCTestCase {
 
         let tests: [(keys: [String], expected: String, desc: String)] = [
             // 과 (ㅗ + ㅏ = ㅘ)
-            (["r", "h", "k"], "과", "ㅘ"),
+            (["ㄱ", "ㅗ", "ㅏ"], "과", "ㅘ"),
             // 웨 (ㅜ + ㅔ = ㅞ)
-            (["d", "n", "p"], "웨", "ㅞ"),
+            (["ㅇ", "ㅜ", "ㅔ"], "웨", "ㅞ"),
             // 의 (ㅡ + ㅣ = ㅢ)
-            (["d", "m", "l"], "의", "ㅢ"),
+            (["ㅇ", "ㅡ", "ㅣ"], "의", "ㅢ"),
             // 외 (ㅗ + ㅣ = ㅚ)
-            (["d", "h", "l"], "외", "ㅚ"),
+            (["ㅇ", "ㅗ", "ㅣ"], "외", "ㅚ"),
             // 워 (ㅜ + ㅓ = ㅝ)
-            (["d", "n", "j"], "워", "ㅝ"),
+            (["ㅇ", "ㅜ", "ㅓ"], "워", "ㅝ"),
         ]
 
         for test in tests {
@@ -170,10 +170,10 @@ final class YAMLLoadedIMETests: XCTestCase {
 
         // 동일한 입력 시퀀스로 테스트
         let testSequences: [[String]] = [
-            ["q", "1", "2", "q"],  // 각
-            ["w", "w", "3", "1"],  // 릴
-            ["s", "s", "1", "2", "w"],  // 한
-            ["q", "3", "w", "w"],  // 글
+            ["ㄱ", "ㅣ", "ㆍ", "ㄱ"],  // 각
+            ["ㄴ", "ㄴ", "ㅡ", "ㅣ"],  // 릴
+            ["ㅅ", "ㅅ", "ㅣ", "ㆍ", "ㄴ"],  // 한
+            ["ㄱ", "ㅡ", "ㄴ", "ㄴ"],  // 글
         ]
 
         for sequence in testSequences {
@@ -211,10 +211,10 @@ final class YAMLLoadedIMETests: XCTestCase {
 
         // 동일한 입력 시퀀스로 테스트
         let testSequences: [[String]] = [
-            ["d", "k", "s", "s", "u", "d"],  // 안녕
-            ["g", "k", "t", "m", "f"],  // 하십
-            ["r", "h", "k"],  // 과
-            ["e", "k", "f", "r"],  // 닭
+            ["ㅇ", "ㅏ", "ㅅ", "ㅅ", "ㅕ", "ㅇ"],  // 안녕
+            ["ㅎ", "ㅏ", "ㅅ", "ㅡ", "ㄹ"],  // 하십
+            ["ㄱ", "ㅗ", "ㅏ"],  // 과
+            ["ㄷ", "ㅏ", "ㄹ", "ㄱ"],  // 닭
         ]
 
         for sequence in testSequences {

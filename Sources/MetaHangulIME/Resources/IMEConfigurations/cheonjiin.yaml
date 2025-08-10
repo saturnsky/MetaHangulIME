@@ -12,21 +12,21 @@ config:
 
 layout:
   # 자음
-  q: { identifier: "ㄱ", label: "ㄱ" }
-  w: { identifier: "ㄴ", label: "ㄴ" }
-  e: { identifier: "ㄷ", label: "ㄷ" }
-  a: { identifier: "ㅂ", label: "ㅂ" }
-  s: { identifier: "ㅅ", label: "ㅅ" }
-  d: { identifier: "ㅈ", label: "ㅈ" }
-  x: { identifier: "ㅇ", label: "ㅇ" }
+  "ㄱ": { identifier: "ㄱ", label: "ㄱ" }
+  "ㄴ": { identifier: "ㄴ", label: "ㄴ" }
+  "ㄷ": { identifier: "ㄷ", label: "ㄷ" }
+  "ㅂ": { identifier: "ㅂ", label: "ㅂ" }
+  "ㅅ": { identifier: "ㅅ", label: "ㅅ" }
+  "ㅈ": { identifier: "ㅈ", label: "ㅈ" }
+  "ㅇ": { identifier: "ㅇ", label: "ㅇ" }
   
   # 모음
-  "1": { identifier: "ㅣ", label: "ㅣ" }
-  "2": { identifier: "ㆍ", label: "ㆍ" }
-  "3": { identifier: "ㅡ", label: "ㅡ" }
+  "ㅣ": { identifier: "ㅣ", label: "ㅣ" }
+  "ㆍ": { identifier: "ㆍ", label: "ㆍ" }
+  "ㅡ": { identifier: "ㅡ", label: "ㅡ" }
   
   # 특수문자
-  c: { identifier: ".,?!", label: ".,?!", isNonJamo: true }
+  ".,?!": { identifier: ".,?!", label: ".,?!", isNonJamo: true }
 
 automata:
   choseong:

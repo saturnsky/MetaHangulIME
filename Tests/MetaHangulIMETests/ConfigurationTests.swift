@@ -341,8 +341,8 @@ extension ConfigurationTests {
           displayMode: "modernMultiple"
           supportStandaloneCluster: true
         layout:
-          q: { identifier: "ㄱ", label: "ㄱ" }
-          "1": { identifier: "ㅣ", label: "ㅣ" }
+          "ㄱ": { identifier: "ㄱ", label: "ㄱ" }
+          "ㅣ": { identifier: "ㅣ", label: "ㅣ" }
         automata:
           choseong:
             transitions:
@@ -363,8 +363,8 @@ extension ConfigurationTests {
         let ime = try IMEFactory.create(from: configuration)
 
         // Test basic input
-        _ = ime.input("q")  // ㄱ
-        _ = ime.input("1")  // ㅣ
+        _ = ime.input("ㄱ")  // ㄱ
+        _ = ime.input("ㅣ")  // ㅣ
         let output = ime.forceCommit()
         XCTAssertEqual(output, "기")
     }
