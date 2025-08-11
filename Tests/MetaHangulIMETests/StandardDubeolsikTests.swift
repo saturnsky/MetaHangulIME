@@ -264,7 +264,7 @@ final class StandardDubeolsikTests: XCTestCase {
 // MARK: - KoreanIMEDelegate
 
 extension StandardDubeolsikTests: KoreanIMEDelegate {
-    func koreanIME(_ ime: KoreanIME, didCommitText text: String) {
+    func koreanIME(_ ime: KoreanIME, didCommitText text: String, composingText: String) {
         capturedCommitText += text
     }
 

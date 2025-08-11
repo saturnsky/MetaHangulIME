@@ -97,7 +97,7 @@ final class CheonJiInPlusTests: XCTestCase {
 // MARK: - KoreanIMEDelegate
 
 extension CheonJiInPlusTests: KoreanIMEDelegate {
-    func koreanIME(_ ime: KoreanIME, didCommitText text: String) {
+    func koreanIME(_ ime: KoreanIME, didCommitText text: String, composingText: String) {
         capturedCommitText += text
     }
 

@@ -7,11 +7,14 @@
 
 import Foundation
 
-/// 커밋 이벤트 처리를 위한 delegate 프로토콜
+/// 입력 결과 처리를 위한 delegate 프로토콜
 public protocol KoreanIMEDelegate: AnyObject {
-    /// 텍스트가 커밋되어야 할 때 호출됨
-    /// - Parameter text: 커밋할 텍스트
-    func koreanIME(_ ime: KoreanIME, didCommitText text: String)
+    /// 모든 입력 처리 후 결과를 전달할 때 호출됨
+    /// - Parameters:
+    ///   - text: 커밋된 텍스트 (빈 문자열일 수 있음)
+    ///   - composingText: 현재 조합 중인 텍스트
+    /// - Note: 이 메서드는 텍스트 커밋 여부와 관계없이 모든 입력에 대해 호출됩니다
+    func koreanIME(_ ime: KoreanIME, didCommitText text: String, composingText: String)
 
     /// IME 내부에서 처리할 수 없는 백스페이스 요청
     /// 호스트 애플리케이션에서 직접 백스페이스를 처리해야 할 때 호출됨
@@ -27,17 +30,17 @@ public protocol KoreanIMEDelegate: AnyObject {
 /// - 상태 관리 (이전/현재 음절)
 /// - 커밋 처리 (커밋 정책에 따른 처리)
 ///
-/// 중요: Swift 라이브러리에서의 커밋 처리
+/// 중요: Swift 라이브러리에서의 입력 처리
 /// ========================================
 /// 이 Swift 라이브러리는 delegate 패턴을 사용하여 호스트 애플리케이션에
-/// 텍스트가 커밋되어야 할 때를 알립니다. 이는 적절한 IME 통합을 위해 필수적입니다:
+/// 모든 입력 처리 결과를 전달합니다. 이는 적절한 IME 통합을 위해 필수적입니다:
 ///
 /// - 라이브러리는 커밋된 텍스트를 내부적으로 저장하지 않습니다
-/// - 텍스트가 커밋되어야 할 때, delegate의 didCommitText 메서드를 호출합니다
+/// - 모든 입력 처리 후 delegate의 didCommitText 메서드를 호출합니다
 /// - 호스트 애플리케이션(IME, 텍스트 편집기 등)은 다음을 담당합니다:
-///   1. delegate를 통해 커밋된 텍스트 수신
-///   2. 적절한 텍스트 버퍼에 삽입
-///   3. 커밋된 텍스트 상태 관리
+///   1. delegate를 통해 커밋된 텍스트와 조합 중인 텍스트 수신
+///   2. 적절한 텍스트 버퍼 관리
+///   3. 커밋된 텍스트와 조합 중인 텍스트 상태 관리
 ///
 /// 이 설계는 다양한 플랫폼(iOS, macOS 등)에서 시스템 IME 프레임워크 및
 /// 텍스트 입력 시스템과의 적절한 통합을 가능하게 합니다
@@ -119,15 +122,18 @@ open class KoreanIME {
 
     /// 키 입력을 처리하고 현재 조합 중인 텍스트를 반환
     /// - Parameter key: 입력 키 문자열
-    /// - Returns: 현재 조합 중인 텍스트 (커밋되지 않음)
-    /// - Note: 텍스트가 커밋되어야 하는 경우 delegate가 호출됩니다
+    /// - Returns: 현재 조합 중인 텍스트
+    /// - Note: 모든 입력에 대해 delegate가 호출되어 커밋된 텍스트와 조합 중인 텍스트를 전달합니다
     public func input(_ key: String) -> String {
+        var committedText = ""
+
         // 가상 키 찾기
         guard let virtualKey = layout[key] else {
             // 알 수 없는 키 - 키 입력을 무시하고, 디버그용 경고 메시지를 출력
             print("Warning: Unknown key '\(key)'")
-
-            return getComposingText()
+            let composingText = getComposingText()
+            delegate?.koreanIME(self, didCommitText: "", composingText: composingText)
+            return composingText
         }
 
         // 입력 처리
@@ -139,29 +145,31 @@ open class KoreanIME {
 
         // 커밋 정책에 따라 상태 업데이트 처리
         if result.cursorMovement > 0 {
-            handleCursorMovement(result: result)
+            committedText = handleCursorMovement(result: result)
         } else {
             // 커서 이동 없음 - 입력 타입에 따라 적절한 update 함수 호출
             if virtualKey.isNonJamo {
-                updateNonJamoStatesFromResult(result)
+                committedText = updateNonJamoStatesFromResult(result)
             } else {
-                updateJamoStatesFromResult(result)
+                committedText = updateJamoStatesFromResult(result)
             }
         }
 
-        return getComposingText()
+        let composingText = getComposingText()
+        delegate?.koreanIME(self, didCommitText: committedText, composingText: composingText)
+        return composingText
     }
 
     /// 백스페이스를 처리하고 현재 조합 중인 텍스트를 반환
-    /// - Returns: 현재 조합 중인 텍스트 (커밋되지 않음)
-    /// - Note: 백스페이스는 조합 중인 텍스트에만 영향을 주며, 커밋된 텍스트에는 영향을 주지 않습니다
+    /// - Returns: 현재 조합 중인 텍스트
+    /// - Note: 내부 상태가 있는 경우에만 delegate가 호출됩니다
     ///         내부에서 처리할 상태가 없을 경우 delegate를 통해 호스트에 백스페이스를 요청합니다
     public func backspace() -> String {
         // 내부에서 처리할 상태가 있는지 확인
         let hasInternalState = uncommittedSyllables.contains { !$0.isEmpty }
 
         if !hasInternalState {
-            // 내부 상태가 없으면 delegate에게 백스페이스 요청
+            // 내부 상태가 없으면 delegate에게 백스페이스 요청만 하고 리턴
             delegate?.koreanIME(self, requestBackspace: ())
             return getComposingText()
         }
@@ -175,7 +183,10 @@ open class KoreanIME {
         // 상태 업데이트
         updateStatesFromBackspaceResult(result)
 
-        return getComposingText()
+        // 백스페이스 처리 후 delegate 호출
+        let composingText = getComposingText()
+        delegate?.koreanIME(self, didCommitText: "", composingText: composingText)
+        return composingText
     }
 
     /// 현재 조합 중인 텍스트 가져오기 (커밋되지 않은 것만)
@@ -193,7 +204,7 @@ open class KoreanIME {
 
     /// 모든 대기 중인 텍스트 강제 커밋
     /// - Returns: 커밋된 텍스트
-    /// - Note: delegate의 didCommitText 메서드가 호출됩니다
+    /// - Note: 텍스트가 있는 경우 delegate의 didCommitText 메서드가 호출됩니다
     public func forceCommit() -> String {
         let textToCommit = getComposingText()
 
@@ -219,7 +230,7 @@ open class KoreanIME {
 
     // MARK: - Private 메서드
 
-    private func handleCursorMovement(result: ProcessResult) {
+    private func handleCursorMovement(result: ProcessResult) -> String {
         // 현재 입력이 Non-Jamo인지 확인 (현재 상태의 nonJamoState로 판단)
         // - 현재 상태에 nonJamoState가 있으면 Non-Jamo 입력
         // - 현재 상태에 jamo가 있으면 Jamo 입력
@@ -234,30 +245,35 @@ open class KoreanIME {
         }
 
         if isCurrentInputNonJamo {
-            handleNonJamoCursorMovement(result: result)
+            return handleNonJamoCursorMovement(result: result)
         } else {
-            handleJamoCursorMovement(result: result)
+            return handleJamoCursorMovement(result: result)
         }
     }
 
     /// Non-Jamo 입력에 대한 커서 이동 처리
-    private func handleNonJamoCursorMovement(result: ProcessResult) {
+    /// - Returns: 커밋된 텍스트
+    private func handleNonJamoCursorMovement(result: ProcessResult) -> String {
+        var committedText = ""
+
         switch processor.config.nonJamoCommitPolicy {
         case .character:
             // 이전 상태 커밋
             if let prev = result.previousState, !prev.isEmpty {
-                let text = processor.buildDisplay(prev)
-                delegate?.koreanIME(self, didCommitText: text)
+                committedText = processor.buildDisplay(prev)
+                uncommittedSyllables = [result.currentState]
+            } else {
+                uncommittedSyllables = [result.currentState]
             }
-            uncommittedSyllables = [result.currentState]
 
         case .onComplete:
             // onComplete 모드: 오토마타 전이 완료 시 커밋
             if let prev = result.previousState, !prev.isEmpty {
-                let text = processor.buildDisplay(prev)
-                delegate?.koreanIME(self, didCommitText: text)
+                committedText = processor.buildDisplay(prev)
+                uncommittedSyllables = [result.currentState]
+            } else {
+                uncommittedSyllables = [result.currentState]
             }
-            uncommittedSyllables = [result.currentState]
 
         case .explicitCommit:
             // explicitCommit 모드: 수동 커밋
@@ -272,19 +288,25 @@ open class KoreanIME {
             newSyllables.append(result.currentState)
             uncommittedSyllables = newSyllables
         }
+
+        return committedText
     }
 
     /// Jamo 입력에 대한 커서 이동 처리 (cursorMovement > 0인 경우)
-    private func handleJamoCursorMovement(result: ProcessResult) {
+    /// - Returns: 커밋된 텍스트
+    private func handleJamoCursorMovement(result: ProcessResult) -> String {
+        var committedText = ""
+
         switch processor.config.jamoCommitPolicy {
         case .syllable:
             // 이전 상태 커밋
             if let prev = result.previousState, !prev.isEmpty {
-                let text = processor.buildDisplay(prev)
-                delegate?.koreanIME(self, didCommitText: text)
+                committedText = processor.buildDisplay(prev)
+                // syllable 모드에서는 이전 상태를 유지하지 않음
+                uncommittedSyllables = [result.currentState]
+            } else {
+                uncommittedSyllables = [result.currentState]
             }
-            // syllable 모드에서는 이전 상태를 유지하지 않음
-            uncommittedSyllables = [result.currentState]
 
         case .explicitCommit:
             // 새 음절로 이동: 기존 배열 크기 + 1
@@ -306,6 +328,8 @@ open class KoreanIME {
 
             uncommittedSyllables = newSyllables
         }
+
+        return committedText
     }
 
     /// 명시적 커밋 수행
@@ -318,16 +342,16 @@ open class KoreanIME {
         }
 
         // 상태 초기화
-        uncommittedSyllables = [SyllableState()]
+        uncommittedSyllables = []
 
         // delegate를 통해 커밋
-        if !textToCommit.isEmpty {
-            delegate?.koreanIME(self, didCommitText: textToCommit)
-        }
+        let composingText = getComposingText() // 커밋 후 남은 조합 중인 텍스트 (빈 상태)
+        delegate?.koreanIME(self, didCommitText: textToCommit, composingText: composingText)
     }
 
     /// ProcessResult를 기반으로 Jamo 상태 업데이트
-    private func updateJamoStatesFromResult(_ result: ProcessResult) {
+    /// - Returns: 커밋된 텍스트 (빈 문자열)
+    private func updateJamoStatesFromResult(_ result: ProcessResult) -> String {
         if processor.config.jamoCommitPolicy == .explicitCommit {
             // explicitCommit 모드: 기존 배열을 보존하면서 마지막 부분만 업데이트
             var newSyllables = uncommittedSyllables
@@ -375,10 +399,13 @@ open class KoreanIME {
                 uncommittedSyllables = [result.currentState]
             }
         }
+
+        return "" // 커서 이동 없는 경우 커밋 없음
     }
 
     /// ProcessResult를 기반으로 Non-Jamo 상태 업데이트
-    private func updateNonJamoStatesFromResult(_ result: ProcessResult) {
+    /// - Returns: 커밋된 텍스트
+    private func updateNonJamoStatesFromResult(_ result: ProcessResult) -> String {
         if processor.config.nonJamoCommitPolicy == .explicitCommit {
             // explicitCommit 모드: 기존 배열을 보존하면서 새 음절 추가
             var newSyllables = uncommittedSyllables
@@ -423,13 +450,15 @@ open class KoreanIME {
                         // 전이가 불가능하면 마지막 음절을 커밋
                         if let lastToCommit = uncommittedSyllables.last {
                             let displayText = processor.buildDisplay(lastToCommit)
-                            delegate?.koreanIME(self, didCommitText: displayText)
                             uncommittedSyllables = []
+                            return displayText
                         }
                     }
                 }
             }
         }
+
+        return "" // 커밋 없음
     }
 
     /// BackspaceProcessResult를 기반으로 상태 업데이트

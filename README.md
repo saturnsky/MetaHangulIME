@@ -45,10 +45,11 @@ _ = ime.input("s")  // 안
 ### 입력 메서드
 
 ```swift
-// 키 입력
-let result = ime.input("k")  // 입력 결과 문자열 반환. 입력값은 layout에 정의된 키값 (identifier가 아님에 유의)
+// 키 입력 - 모든 입력에 대해 delegate가 호출됨
+let result = ime.input("k")  // 현재 조합 중인 문자열 반환
+// 입력값은 layout에 정의된 키값 (identifier가 아님에 유의)
 
-// 백스페이스
+// 백스페이스 - 내부 상태 변화 시만 delegate 호출
 let deleted = ime.backspace()  // 삭제 후 남은 문자열 반환
 
 // 강제 커밋
@@ -65,13 +66,22 @@ ime.reset()
 
 ```swift
 extension MyViewController: KoreanIMEDelegate {
-    func koreanIME(_ ime: KoreanIME, didCommitText text: String) {
-        // 커밋된 텍스트 처리
-        textField.insertText(text)
+    func koreanIME(_ ime: KoreanIME, didCommitText text: String, composingText: String) {
+        // 모든 입력 처리 후 호출됨
+        // text: 커밋된 텍스트 (빈 문자열일 수 있음)
+        // composingText: 현재 조합 중인 텍스트
+        
+        if !text.isEmpty {
+            // 커밋된 텍스트 처리
+            textField.insertText(text)
+        }
+        
+        // 조합 중인 텍스트 표시
+        displayComposingText(composingText)
     }
     
     func koreanIME(_ ime: KoreanIME, requestBackspace: Void) {
-        // 백스페이스 요청 처리
+        // IME 내부에 처리할 상태가 없을 때 호출
         textField.deleteBackward()
     }
 }
@@ -110,9 +120,14 @@ class ViewController: UIViewController {
 }
 
 extension ViewController: KoreanIMEDelegate {
-    func koreanIME(_ ime: KoreanIME, didCommitText text: String) {
-        // 완성된 텍스트를 텍스트 필드에 추가
-        textField.text = (textField.text ?? "") + text
+    func koreanIME(_ ime: KoreanIME, didCommitText text: String, composingText: String) {
+        // 커밋된 텍스트를 텍스트 필드에 추가
+        if !text.isEmpty {
+            textField.text = (textField.text ?? "") + text
+        }
+        
+        // 조합 중인 텍스트 표시 (예: 커서 위치에 표시)
+        showComposingTextAtCursor(composingText)
     }
     
     func koreanIME(_ ime: KoreanIME, requestBackspace: Void) {
