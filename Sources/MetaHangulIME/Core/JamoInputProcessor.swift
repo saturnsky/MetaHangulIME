@@ -79,7 +79,11 @@ public final class JamoInputProcessor {
         }
 
         // 일반적인 조합이 불가능할 경우, 도깨비불 조합을 시도
-        // 현재 낱자에 종성이 있고, 도깨비불 오토마타에 따라 중성과 결합 가능한 경우 해당 결과를 반환
+
+        // 초성-도깨비불 조합
+        // - 현재 낱자에 종성이 있고, 해당 종성이 이번에 입력된 낱자와 결합하여 다음 state의 초성이 될 수 있을 경우 해당 결과를 반환
+        // 도깨비불 조합 (중성-도깨비불 및 초성-도깨비불)
+        // - 현재 낱자에 종성이 있고, 도깨비불 오토마타에 따라 결합 가능한 경우 해당 결과를 반환
         if let dokkaebiResult = tryDokkaebi(currentState: currentState, inputKey: inputKey) {
             return dokkaebiResult
         }
@@ -234,19 +238,39 @@ public final class JamoInputProcessor {
         return allowed
     }
 
-    /// 도깨비불 조합을 시도
+    /// 도깨비불 조합을 시도 (중성-도깨비불 및 초성-도깨비불)
     private func tryDokkaebi(
         currentState: SyllableState,
         inputKey: VirtualKey
     ) -> ProcessResult? {
         guard let dokkaebi = dokkaebiAutomaton,
               let jongseong = currentState.jongseongState,
-              jungseongAutomaton.transition(currentState: nil, inputKey: inputKey.keyIdentifier) != nil,
               currentState.compositionOrder.isEmpty || currentState.compositionOrder.last == .jongseong
         else { return nil }
 
-        let result = dokkaebi.process(jongseong)
-        guard result.shouldSplit else { return nil }
+        let inputIdentifier = inputKey.keyIdentifier
+        var dokkaebiResult: DokkaebiResult?
+        var isJungseongDokkaebi = false
+
+        // 중성-도깨비불 체크 (입력키가 중성으로 전이 가능한 경우)
+        if jungseongAutomaton.transition(currentState: nil, inputKey: inputIdentifier) != nil {
+            let result = dokkaebi.processJungseongDokkaebi(jongseong)
+            if result.shouldSplit {
+                dokkaebiResult = result
+                isJungseongDokkaebi = true
+            }
+        }
+
+        // 초성-도깨비불 체크 (입력키가 초성으로 전이 가능한 경우)
+        if dokkaebiResult == nil && choseongAutomaton.transition(currentState: nil, inputKey: inputIdentifier) != nil {
+            let result = dokkaebi.processChoseongDokkaebi(jongseong, inputKey: inputIdentifier)
+            if result.shouldSplit {
+                dokkaebiResult = result
+                isJungseongDokkaebi = false
+            }
+        }
+
+        guard let result = dokkaebiResult else { return nil }
 
         // 이전 음절의 종성 정보를 업데이트
         let updatedPrevious = currentState.copy()
@@ -256,18 +280,24 @@ public final class JamoInputProcessor {
             updatedPrevious.compositionOrder.remove(at: lastIdx)
         }
 
-        // 이전 음절에서 분리된 종성을 새로운 음절의 초성으로 이동
+        // 새 음절을 생성하고 이동된 초성과 입력된 키를 추가
         let newCurrent = SyllableState()
         newCurrent.choseongState = result.movedChoseongState
         newCurrent.compositionOrder.append(.choseong)
 
-        // 위 음절에 입력된 중성 낱자를 추가
-        if let jungseong = jungseongAutomaton.transition(
-            currentState: nil,
-            inputKey: inputKey.keyIdentifier
-        ) {
-            newCurrent.jungseongState = jungseong
-            newCurrent.compositionOrder.append(.jungseong)
+        if isJungseongDokkaebi {
+            // 중성-도깨비불: 입력된 중성 낱자를 추가
+            if let jungseong = jungseongAutomaton.transition(
+                currentState: nil,
+                inputKey: inputIdentifier
+            ) {
+                newCurrent.jungseongState = jungseong
+                newCurrent.compositionOrder.append(.jungseong)
+            }
+        } else {
+            // 초성-도깨비불: 결과를 그대로 반영
+            newCurrent.choseongState = result.movedChoseongState
+            newCurrent.compositionOrder.append(.choseong)
         }
 
         return ProcessResult(

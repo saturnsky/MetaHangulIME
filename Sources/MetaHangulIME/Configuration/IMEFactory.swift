@@ -160,12 +160,27 @@ private extension IMEFactory {
     static func createDokkaebiAutomaton(from definition: DokkaebiDefinition) -> DokkaebiAutomaton {
         let automaton = DokkaebiAutomaton()
 
-        for transition in definition.transitions {
-            automaton.addTransition(
-                jongseongState: transition.jongseong,
-                remainingJong: transition.remaining,
-                movedCho: transition.moved
-            )
+        // 중성-도깨비불 전이 로드
+        if let jungseongTransitions = definition.jungseongTransitions {
+            for transition in jungseongTransitions {
+                automaton.addJungseongTransition(
+                    jongseongState: transition.jongseong,
+                    remainingJong: transition.remaining,
+                    movedCho: transition.moved
+                )
+            }
+        }
+
+        // 초성-도깨비불 전이 로드
+        if let choseongTransitions = definition.choseongTransitions {
+            for transition in choseongTransitions {
+                automaton.addChoseongTransition(
+                    jongseongState: transition.jongseong,
+                    inputKey: transition.inputKey,
+                    remainingJong: transition.remaining,
+                    movedCho: transition.moved
+                )
+            }
         }
 
         return automaton

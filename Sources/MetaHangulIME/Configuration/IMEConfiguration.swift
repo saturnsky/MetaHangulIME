@@ -71,12 +71,23 @@ public struct TransitionDefinition: Codable {
 
 /// 도깨비불 오토마타 정의
 public struct DokkaebiDefinition: Codable {
-    public let transitions: [DokkaebiTransition]
+    /// 중성-도깨비불 전이
+    public let jungseongTransitions: [DokkaebiTransition]?
+    /// 초성-도깨비불 전이
+    public let choseongTransitions: [ChoseongDokkaebiTransition]?
 }
 
-/// 도깨비불 전이
+/// 중성-도깨비불 전이
 public struct DokkaebiTransition: Codable {
     public let jongseong: String
+    public let remaining: String?
+    public let moved: String
+}
+
+/// 초성-도깨비불 전이
+public struct ChoseongDokkaebiTransition: Codable {
+    public let jongseong: String
+    public let inputKey: String
     public let remaining: String?
     public let moved: String
 }

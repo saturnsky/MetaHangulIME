@@ -69,6 +69,36 @@ final class CheonJiInPlusTests: XCTestCase {
         XCTAssertEqual(capturedCommitText, "깐", "Should produce 깐")
     }
 
+    func testDokkaebi() throws {
+        let testIME = try IMEFactory.createFromPreset(.cheonJiInPlus)
+        testIME.delegate = self
+        ime = testIME
+
+        // Test "삐따뗀" = ㅍ+ㅍ+ㅣ+ㅌ+ㅌ+ㅣ+ㆍ+ㅌ+ㅌ+ㆍ+ㅣ+ㅣ+ㄴ
+        let steps = [
+            ("ㅍ", "ㅍ"),  // ㅍ
+            ("ㅍ", "ㅃ"),  // ㅍ + ㅍ = ㅃ
+            ("ㅣ", "삐"),  // 삐
+            ("ㅌ", "삩"),  // 삐 + ㅌ = 삩
+            ("ㅌ", "삐ㄸ"),  // 삩 + ㅌ = 삐ㄸ
+            ("ㅣ", "삐띠"), // 삐ㄸ + ㅣ = 삐띠
+            ("ㆍ", "삐따"), // 삐띠 + ㆍ = 삐따
+            ("ㅌ", "삐땉"), // 삐따 + ㅌ = 삐땉
+            ("ㅌ", "삐따ㄸ"), // 삐따 + ㅌ = 삐따ㄸ
+            ("ㆍ", "삐따ㄸㆍ"), // 삐따ㄸ + ㆍ = 삐따ㄸㆍ
+            ("ㅣ", "삐따떠"), // 삐따ㄸㆍ + ㅣ = 삐따떠
+            ("ㅣ", "삐따떼"), // 삐따떠 + ㅣ = 삐따떼
+            ("ㄴ", "삐따뗀"), // 삐따떼 + ㄴ = 삐따뗀
+        ]
+        for (key, expected) in steps {
+            _ = testIME.input(key)
+            let result = testIME.getComposingText()
+            XCTAssertEqual(result, expected, "Failed for input \(key): expected \(expected), got \(result)")
+        }
+        _ = testIME.forceCommit()
+        XCTAssertEqual(capturedCommitText, "삐따뗀", "Should produce 삐따뗀")
+    }
+
     // Test many different commit sequences
     func testCommit() throws {
         let testIME = try IMEFactory.createFromPreset(.cheonJiInPlus)

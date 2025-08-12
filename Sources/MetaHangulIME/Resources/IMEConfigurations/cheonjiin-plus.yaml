@@ -33,36 +33,62 @@ layout:
   ".,": { identifier: ".,", label: ".,", isNonJamo: true }
   "?!": { identifier: "?!", label: "?!", isNonJamo: true }
 
-automata:
+  # 롱 탭
+  "1": { identifier: "1", label: "1", isNonJamo: true }
+  "2": { identifier: "2", label: "2", isNonJamo: true }
+  "3": { identifier: "3", label: "3", isNonJamo: true }
+  "4": { identifier: "4", label: "4", isNonJamo: true }
+  "5": { identifier: "5", label: "5", isNonJamo: true }
+  "6": { identifier: "6", label: "6", isNonJamo: true }
+  "7": { identifier: "7", label: "7", isNonJamo: true }
+  "8": { identifier: "8", label: "8", isNonJamo: true }
+  "9": { identifier: "9", label: "9", isNonJamo: true }
+  "0": { identifier: "0", label: "0", isNonJamo: true }
+  "ㄲ": { identifier: "ㄲ", label: "ㄲ" }
+  "ㄸ": { identifier: "ㄸ", label: "ㄸ" }
+  "ㅃ": { identifier: "ㅃ", label: "ㅃ" }
+  "ㅆ": { identifier: "ㅆ", label: "ㅆ" }
+  "ㅉ": { identifier: "ㅉ", label: "ㅉ" }
+
+automata:  
   choseong:
     transitions:
       # 기본 자음
       - { from: "", input: "ㄱ", to: "ㄱ" }
       - { from: "", input: "ㅋ", to: "ㅋ" }
+      - { from: "", input: "ㄲ", to: "ㄲ" }
       - { from: "", input: "ㄴ", to: "ㄴ" }
       - { from: "", input: "ㄹ", to: "ㄹ" }
       - { from: "", input: "ㄷ", to: "ㄷ" }
       - { from: "", input: "ㅌ", to: "ㅌ" }
+      - { from: "", input: "ㄸ", to: "ㄸ" }
       - { from: "", input: "ㅂ", to: "ㅂ" }
       - { from: "", input: "ㅍ", to: "ㅍ" }
+      - { from: "", input: "ㅃ", to: "ㅃ" }
       - { from: "", input: "ㅅ", to: "ㅅ" }
       - { from: "", input: "ㅎ", to: "ㅎ" }
+      - { from: "", input: "ㅆ", to: "ㅆ" }
       - { from: "", input: "ㅈ", to: "ㅈ" }
       - { from: "", input: "ㅊ", to: "ㅊ" }
+      - { from: "", input: "ㅉ", to: "ㅉ" }
       - { from: "", input: "ㅇ", to: "ㅇ" }
       - { from: "", input: "ㅁ", to: "ㅁ" }
       
-      # ㅋ + ㅋ = ㄲ
+      # ㅋ 조합
       - { from: "ㅋ", input: "ㅋ", to: "ㄲ" }
-      # ㅌ + ㅌ = ㄸ
+      
+      # ㅌ 조합
       - { from: "ㅌ", input: "ㅌ", to: "ㄸ" }
-      # ㅍ + ㅍ = ㅃ
+      
+      # ㅍ 조합
       - { from: "ㅍ", input: "ㅍ", to: "ㅃ" }
-      # ㅎ + ㅎ = ㅆ
+      
+      # ㅎ 조합
       - { from: "ㅎ", input: "ㅎ", to: "ㅆ" }
-      # ㅊ + ㅊ = ㅉ
+      
+      # ㅊ 조합
       - { from: "ㅊ", input: "ㅊ", to: "ㅉ" }
-    
+
     display:
       "ㄱ": "\u1100"  # ᄀ
       "ㄲ": "\u1101"  # ᄁ
@@ -83,7 +109,7 @@ automata:
       "ㅌ": "\u1110"  # ᄐ
       "ㅍ": "\u1111"  # ᄑ
       "ㅎ": "\u1112"  # ᄒ
-  
+
   jungseong:
     transitions:
       # 기본 모음
@@ -212,6 +238,10 @@ automata:
       - { from: "ㄹ", input: "ㅎ", to: "ㅀ" }
       # ㅂ + ㅅ = ㅄ
       - { from: "ㅂ", input: "ㅅ", to: "ㅄ" }
+
+      # long press
+      - { from: "", input: "ㄲ", to: "ㄲ"}
+      - { from: "", input: "ㅆ", to: "ㅆ" }
     
     display:
       "ㄱ": "\u11A8"  # ᆨ
@@ -243,7 +273,8 @@ automata:
       "ㅎ": "\u11C2"  # ᇂ
   
   dokkaebibul:
-    transitions:
+    # 중성-도깨비불 전이
+    jungseongTransitions:
       # 일반 도깨비 분리
       - { jongseong: "ㄳ", remaining: "ㄱ", moved: "ㅅ" }
       - { jongseong: "ㄵ", remaining: "ㄴ", moved: "ㅈ" }
@@ -274,6 +305,20 @@ automata:
       - { jongseong: "ㅎ", remaining: null, moved: "ㅎ" }
       - { jongseong: "ㄲ", remaining: null, moved: "ㄲ" }
       - { jongseong: "ㅆ", remaining: null, moved: "ㅆ" }
+    
+    # 초성-도깨비불 전이
+    # 예: 롵 + ㅌ -> 로 + 뜨 (ㅌ 종성 + ㅌ 입력 -> ㄸ 초성)
+    choseongTransitions:
+      # ㅌ + ㅌ -> ㄸ
+      - { jongseong: "ㅌ", inputKey: "ㅌ", remaining: "", moved: "ㄸ" }
+      # ㅋ + ㅋ -> ㄲ
+      - { jongseong: "ㅋ", inputKey: "ㅋ", remaining: "", moved: "ㄲ" }
+      # ㅍ + ㅍ -> ㅃ
+      - { jongseong: "ㅍ", inputKey: "ㅍ", remaining: "", moved: "ㅃ" }
+      # ㅎ + ㅎ -> ㅆ
+      - { jongseong: "ㅎ", inputKey: "ㅎ", remaining: "", moved: "ㅆ" }
+      # ㅊ + ㅊ -> ㅉ
+      - { jongseong: "ㅊ", inputKey: "ㅊ", remaining: "", moved: "ㅉ" }
   
   backspace:
     transitions:
@@ -320,8 +365,10 @@ automata:
       
       # . + . = ,
       - { from: ".", input: ".,", to: "," }
+      - { from: ",", input: ".,", to: "." }
       # ? + ? = !
       - { from: "?", input: "?!", to: "!" }
+      - { from: "!", input: "?!", to: "?" }
     
     display:
       ".": "."

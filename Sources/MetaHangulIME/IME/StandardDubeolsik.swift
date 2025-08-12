@@ -326,7 +326,7 @@ public final class StandardDubeolsik: KoreanIME {
         ]
 
         for consonant in singleConsonants {
-            automaton.addTransition(jongseongState: consonant, remainingJong: nil, movedCho: consonant)
+            automaton.addJungseongTransition(jongseongState: consonant, remainingJong: nil, movedCho: consonant)
         }
 
         // 분할되는 복합 자음
@@ -344,7 +344,7 @@ public final class StandardDubeolsik: KoreanIME {
             (jongseong: "ㅄ", remaining: "ㅂ", moved: "ㅅ"),
         ]
 
-        automaton.addTransitions(compoundConsonants)
+        automaton.addJungseongTransitions(compoundConsonants)
 
         return automaton
     }

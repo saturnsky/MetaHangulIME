@@ -229,7 +229,7 @@ automata:
       "ㄹㄷ": "\u11AF\u11AE"  # ᆯᆮ
   
   dokkaebibul:
-    transitions:
+    jungseongTransitions:
       # 표준 도깨비불 분리
       - { jongseong: "ㄳ", remaining: "ㄱ", moved: "ㅅ" }
       - { jongseong: "ㄵ", remaining: "ㄴ", moved: "ㅈ" }

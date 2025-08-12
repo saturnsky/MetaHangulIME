@@ -206,7 +206,7 @@ automata:
       "ㅎ": "\u11C2"  # ᇂ
   
   dokkaebibul:
-    transitions:
+    jungseongTransitions:
       # 전체가 이동하는 단일 자음
       - { jongseong: "ㄱ", remaining: null, moved: "ㄱ" }
       - { jongseong: "ㄲ", remaining: null, moved: "ㄲ" }
