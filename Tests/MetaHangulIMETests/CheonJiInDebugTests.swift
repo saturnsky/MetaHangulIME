@@ -91,7 +91,8 @@ final class CheonJiInDebugTests: XCTestCase {
         ]
 
         for (key, expected) in steps {
-            let result = ime.input(key)
+            _ = ime.input(key)
+            let result = ime.getComposingText()
             printStateTransition(key: key, result: result, expected: expected)
 
             if result != expected {
@@ -128,7 +129,8 @@ final class CheonJiInDebugTests: XCTestCase {
         ]
 
         for (key, expected, description) in steps {
-            let result = ime.input(key)
+            _ = ime.input(key)
+            let result = ime.getComposingText()
             print("\n--- \(description) ---")
             printStateTransition(key: key, result: result, expected: expected)
 

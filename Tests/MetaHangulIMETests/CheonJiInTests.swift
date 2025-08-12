@@ -225,20 +225,24 @@ final class CheonJiInTests: XCTestCase {
         ime.reset()
         capturedCommitText = ""
 
-        var result = ime.input(".")  // .
+        _ = ime.input(".")  // .
+        var result = ime.getComposingText()
         print("First c result: '\(result)'")
         XCTAssertEqual(result, ".", "First period failed")
 
-        result = ime.input(".")  // ,
+        _ = ime.input(".")  // ,
+        result = ime.getComposingText()
         print("Second c result: '\(result)'")
         print("Has composing text: \(ime.hasComposingText)")
         print("Composing text: '\(ime.getComposingText())'")
         XCTAssertEqual(result, ",", "Period to comma failed")
 
-        result = ime.input(".")  // ?
+        _ = ime.input(".")  // ?
+        result = ime.getComposingText()
         XCTAssertEqual(result, "?", "Comma to question failed")
 
-        result = ime.input(".")  // !
+        _ = ime.input(".")  // !
+        result = ime.getComposingText()
         XCTAssertEqual(result, "", "! should auto-commit since there is no next automata transition")
 
         // Test special character doesn't interfere with Hangul
@@ -275,7 +279,8 @@ final class CheonJiInTests: XCTestCase {
         ]
 
         for (idx, (key, expected)) in steps.enumerated() {
-            let result = ime.input(key)
+            _ = ime.input(key)
+            let result = ime.getComposingText()
             if idx == 6 && result != expected {
                 // Debug 할ㄷ case
                 print("DEBUG 할ㄷ: result=\(result), expected=\(expected)")
@@ -303,7 +308,8 @@ final class CheonJiInTests: XCTestCase {
         ]
 
         for (key, expected) in steps {
-            let result = ime.input(key)
+            _ = ime.input(key)
+            let result = ime.getComposingText()
             XCTAssertEqual(result, expected, "헕 test failed at key: \(key)")
         }
     }
@@ -326,7 +332,8 @@ final class CheonJiInTests: XCTestCase {
         ]
 
         for (key, expected) in steps {
-            let result = ime.input(key)
+            _ = ime.input(key)
+            let result = ime.getComposingText()
             XCTAssertEqual(result, expected, "돋대 test failed at key: \(key)")
         }
     }
@@ -376,7 +383,10 @@ final class CheonJiInTests: XCTestCase {
         ]
 
         for (key, isBackspace, expected) in steps {
-            let result = isBackspace ? ime.backspace() : ime.input(key)
+            if !isBackspace {
+                _ = ime.input(key)
+            }
+            let result = isBackspace ? ime.backspace() : ime.getComposingText()
             XCTAssertEqual(result, expected, "동해물과 test failed at step expecting: \(expected)")
         }
     }

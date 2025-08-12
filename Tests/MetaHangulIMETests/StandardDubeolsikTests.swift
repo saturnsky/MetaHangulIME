@@ -197,11 +197,9 @@ final class StandardDubeolsikTests: XCTestCase {
 
         _ = ime.input("ㄱ")  // ㄱ
         _ = ime.input("ㅏ")  // 가
-        _ = ime.input("1")  // Should commit 가 and then 1
+        _ = ime.input("1")  // Should commit 가 and 1 (transitionCommitPolicy: always, nonJamoCommitPolicy: onComplete)
 
-        XCTAssertEqual(capturedCommitText, "가", "Non-Hangul input handling failed")
-        _ = ime.forceCommit()
-        XCTAssertEqual(capturedCommitText, "가1", "Non-Hangul input commit failed")
+        XCTAssertEqual(capturedCommitText, "가1", "Non-Hangul input handling failed")
     }
 
     // MARK: - Sequential Input Tests
@@ -214,7 +212,8 @@ final class StandardDubeolsikTests: XCTestCase {
         _ = ime.input("ㅎ")  // ㅎ
         _ = ime.input("ㅏ")  // 하
         _ = ime.input("ㄴ")  // 한
-        let result1 = ime.input("ㄱ")  // 한 committed, ㄱ
+        _ = ime.input("ㄱ")  // 한 committed, ㄱ
+        let result1 = ime.getComposingText()
 
         XCTAssertEqual(capturedCommitText, "한", "First syllable not committed")
         XCTAssertEqual(result1, "ㄱ", "Second syllable initial not correct")
