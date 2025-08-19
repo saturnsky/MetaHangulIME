@@ -197,7 +197,6 @@ extension ViewController: KoreanIMEDelegate {
 public struct VirtualKey {
     public let keyIdentifier: String    // 내부 처리용 식별자
     public let label?: String           // 표시용 레이블
-    public let isNonJamo: Bool        // 자모가 아닌 문자 여부
 }
 
 // 음절 상태 관리
@@ -254,7 +253,7 @@ layout:
   q: { identifier: "ㄱ", label: "ㄱ" }
   w: { identifier: "ㄴ", label: "ㄴ" }
   1: { identifier: "ㅣ", label: "ㅣ" }
-  c: { identifier: ".,?!", label: ".,?!", isNonJamo: true }
+  c: { identifier: ".,?!", label: ".,?!" }
 
 # 오토마타 정의
 automata:

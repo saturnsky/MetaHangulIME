@@ -22,6 +22,7 @@ public protocol KoreanIMEDelegate: AnyObject {
     func koreanIME(_ ime: KoreanIME, requestBackspace: Void)
 }
 
+// swiftlint:disable type_body_length
 /// 메타 한글 프레임워크를 사용하는 한국어 IME의 추상 베이스 클래스
 ///
 /// 이 클래스는 한국어 입력 메서드의 핵심 기능을 제공합니다:
@@ -136,17 +137,6 @@ open class KoreanIME {
             return composingText
         }
 
-        // TransitionCommitPolicy가 .always인 경우, 입력이 Jamo와 Non-Jamo를 오가는 시점에 우선 커밋
-        if processor.config.transitionCommitPolicy == .always {
-            if !currentState.isEmpty && currentState.hasJamo == virtualKey.isNonJamo {
-                // 현재 상태가 비어있지 않고, Jamo 입력 중 nonJamo 입력이 들어왔거나, 반대의 경우
-                if !currentState.isEmpty {
-                    committedText = getComposingText()
-                    uncommittedSyllables = []
-                }
-            }
-        }
-
         // 입력 처리
         let result = processor.process(
             previousState: previousState,
@@ -154,12 +144,18 @@ open class KoreanIME {
             inputKey: virtualKey
         )
 
+        // 자동 커밋이 필요한 경우, 상태 업데이트 전에 커밋을 우선 진행
+        if result.needAutoCommit {
+            committedText = getComposingText()
+            uncommittedSyllables = [result.currentState]
+        }
+
         // 커밋 정책에 따라 상태 업데이트 처리
         if result.cursorMovement > 0 {
             committedText += handleCursorMovement(result: result)
         } else {
-            // 커서 이동 없음 - 입력 타입에 따라 적절한 update 함수 호출
-            if virtualKey.isNonJamo {
+            // 커서 이동 없음 - 현재의 타입에 따라 적절한 update 함수 호출
+            if !result.currentState.hasJamo {
                 committedText += updateNonJamoStatesFromResult(result)
             } else {
                 committedText += updateJamoStatesFromResult(result)
@@ -514,3 +510,4 @@ open class KoreanIME {
         }
     }
 }
+// swiftlint:enable type_body_length

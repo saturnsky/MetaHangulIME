@@ -30,20 +30,6 @@ public struct ProcessorConfig: Codable {
 public struct KeyDefinition: Codable {
     public let identifier: String
     public let label: String
-    public let isNonJamo: Bool?
-
-    private enum CodingKeys: String, CodingKey {
-        case identifier
-        case label
-        case isNonJamo
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        identifier = try container.decode(String.self, forKey: .identifier)
-        label = try container.decode(String.self, forKey: .label)
-        isNonJamo = try container.decodeIfPresent(Bool.self, forKey: .isNonJamo)
-    }
 }
 
 /// 오토마타 정의

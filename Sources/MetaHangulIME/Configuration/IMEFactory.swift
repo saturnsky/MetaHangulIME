@@ -93,8 +93,7 @@ private extension IMEFactory {
         for (key, definition) in definitions {
             layout[key] = VirtualKey(
                 keyIdentifier: definition.identifier,
-                label: definition.label,
-                isNonJamo: definition.isNonJamo ?? false
+                label: definition.label
             )
         }
 

@@ -35,7 +35,7 @@ public final class CheonJiIn: KoreanIME {
             "ㅡ": VirtualKey(keyIdentifier: "ㅡ", label: "ㅡ"),
 
             // 특수문자
-            ".": VirtualKey(keyIdentifier: ".", label: ".", isNonJamo: true),
+            ".": VirtualKey(keyIdentifier: ".", label: "."),
         ]
     }
 

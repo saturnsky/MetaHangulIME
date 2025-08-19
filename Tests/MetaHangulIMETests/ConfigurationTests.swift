@@ -24,7 +24,7 @@ final class ConfigurationTests: XCTestCase {
           supportStandaloneCluster: false
         layout:
           a: { identifier: "ㄱ", label: "ㄱ" }
-          b: { identifier: "ㄴ", label: "ㄴ", isNonJamo: true }
+          b: { identifier: "ㄴ", label: "ㄴ" }
         automata:
           choseong:
             transitions:
@@ -40,7 +40,7 @@ final class ConfigurationTests: XCTestCase {
         XCTAssertEqual(configuration.config.orderMode, "sequential")
         XCTAssertEqual(configuration.layout.count, 2)
         XCTAssertEqual(configuration.layout["a"]?.identifier, "ㄱ")
-        XCTAssertEqual(configuration.layout["b"]?.isNonJamo, true)
+        XCTAssertEqual(configuration.layout["b"]?.identifier, "ㄴ")
         XCTAssertNotNil(configuration.automata.choseong)
         XCTAssertEqual(configuration.automata.choseong?.transitions.count, 1)
     }
@@ -282,7 +282,7 @@ final class ConfigurationTests: XCTestCase {
         layout:
           a: { identifier: "ㄱ", label: "ㄱ" }
           b: { identifier: "ㅏ", label: "ㅏ" }
-          c: { identifier: ".", label: ".", isNonJamo: true }
+          c: { identifier: ".", label: "." }
         automata:
           choseong:
             transitions:
