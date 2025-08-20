@@ -12,6 +12,45 @@ public enum JamoPosition: Int, CaseIterable {
     case choseong = 0   // 초성 (초성)
     case jungseong = 1  // 중성 (모음)
     case jongseong = 2  // 종성 (받침)
+
+    /// 문자열 배열을 JamoPosition 배열로 변환
+    public static func parseOrder(from strings: [String]) throws -> [JamoPosition] {
+        var result: [JamoPosition] = []
+        var seenPositions: Set<JamoPosition> = []
+
+        for string in strings {
+            guard let position = JamoPosition.from(string: string) else {
+                throw ConfigurationError.invalidJamoPosition(string)
+            }
+
+            // 중복 체크
+            if seenPositions.contains(position) {
+                throw ConfigurationError.invalidJamoPosition("Duplicate position: \(string)")
+            }
+
+            result.append(position)
+            seenPositions.insert(position)
+        }
+
+        // 모든 위치가 포함되어야 함
+        if result.count != 3 {
+            throw ConfigurationError.invalidJamoPosition(
+                "All three positions (choseong, jungseong, jongseong) must be specified"
+            )
+        }
+
+        return result
+    }
+
+    /// 문자열을 JamoPosition으로 변환
+    private static func from(string: String) -> JamoPosition? {
+        switch string {
+        case "choseong": return .choseong
+        case "jungseong": return .jungseong
+        case "jongseong": return .jongseong
+        default: return nil
+        }
+    }
 }
 
 /// OrderMode: 낱자 조합 순서

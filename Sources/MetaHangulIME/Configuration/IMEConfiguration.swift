@@ -24,6 +24,28 @@ public struct ProcessorConfig: Codable {
     public let transitionCommitPolicy: String
     public let displayMode: String
     public let supportStandaloneCluster: Bool
+    public let newSyllableOrder: [String]?
+
+    private enum CodingKeys: String, CodingKey {
+        case orderMode
+        case jamoCommitPolicy
+        case nonJamoCommitPolicy
+        case transitionCommitPolicy
+        case displayMode
+        case supportStandaloneCluster
+        case newSyllableOrder
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        orderMode = try container.decode(String.self, forKey: .orderMode)
+        jamoCommitPolicy = try container.decode(String.self, forKey: .jamoCommitPolicy)
+        nonJamoCommitPolicy = try container.decode(String.self, forKey: .nonJamoCommitPolicy)
+        transitionCommitPolicy = try container.decode(String.self, forKey: .transitionCommitPolicy)
+        displayMode = try container.decode(String.self, forKey: .displayMode)
+        supportStandaloneCluster = try container.decode(Bool.self, forKey: .supportStandaloneCluster)
+        newSyllableOrder = try container.decodeIfPresent([String].self, forKey: .newSyllableOrder)
+    }
 }
 
 /// 키 정의
@@ -53,6 +75,7 @@ public struct TransitionDefinition: Codable {
     public let from: String
     public let input: String
     public let to: String
+    public let switchTo: String?
 }
 
 /// 도깨비불 오토마타 정의
@@ -120,13 +143,23 @@ extension ProcessorConfig {
             throw ConfigurationError.invalidDisplayMode(displayMode)
         }
 
+        // newSyllableOrder 파싱 - 없으면 기본값 사용
+        let syllableOrder: [JamoPosition]
+        if let orderStrings = newSyllableOrder {
+            syllableOrder = try JamoPosition.parseOrder(from: orderStrings)
+        } else {
+            // 기본값: 초성-중성-종성
+            syllableOrder = [.choseong, .jungseong, .jongseong]
+        }
+
         return InputProcessorConfig(
             orderMode: orderMode,
             jamoCommitPolicy: jamoCommitPolicy,
             nonJamoCommitPolicy: nonJamoCommitPolicy,
             transitionCommitPolicy: transitionCommitPolicy,
             displayMode: displayMode,
-            supportStandaloneCluster: supportStandaloneCluster
+            supportStandaloneCluster: supportStandaloneCluster,
+            newSyllableOrder: syllableOrder
         )
     }
 }
@@ -141,6 +174,7 @@ public enum ConfigurationError: LocalizedError {
     case invalidDisplayMode(String)
     case invalidYAML
     case fileNotFound(String)
+    case invalidJamoPosition(String)
 
     public var errorDescription: String? {
         switch self {
@@ -158,6 +192,8 @@ public enum ConfigurationError: LocalizedError {
             return "Invalid YAML format"
         case .fileNotFound(let filename):
             return "Configuration file not found: \(filename)"
+        case .invalidJamoPosition(let position):
+            return "Invalid jamo position: \(position). Expected: choseong, jungseong, jongseong"
         }
     }
 }

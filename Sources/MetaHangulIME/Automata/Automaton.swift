@@ -7,12 +7,31 @@
 
 import Foundation
 
+/// Type of automaton to switch to
+public enum AutomatonType: String, CaseIterable {
+    case choseong
+    case jungseong
+    case jongseong
+    case nonJamo
+}
+
 /// Base class for all automata used in the Meta Hangul IME framework
 /// An automaton manages state transitions and display mappings for jamo (Korean letters)
 open class Automaton {
-    /// Transition table: Maps (current_state, input_key) -> new_state
+    /// Transition information including target state and optional switchTo automaton
+    public struct TransitionInfo {
+        let toState: String
+        let switchTo: AutomatonType?
+
+        public init(toState: String, switchTo: AutomatonType? = nil) {
+            self.toState = toState
+            self.switchTo = switchTo
+        }
+    }
+
+    /// Transition table: Maps (current_state, input_key) -> TransitionInfo
     /// Using nested dictionary for O(1) lookup performance
-    private var transitionTable: [String: [String: String]] = [:]
+    private var transitionTable: [String: [String: TransitionInfo]] = [:]
 
     /// Display table: Maps state -> Unicode character for display
     private var displayTable: [String: String] = [:]
@@ -26,9 +45,9 @@ open class Automaton {
     /// - Parameters:
     ///   - currentState: Current state (nil represents empty state)
     ///   - inputKey: Input key identifier
-    /// - Returns: New state if transition exists, nil otherwise
+    /// - Returns: TransitionInfo if transition exists, nil otherwise
     @inline(__always)
-    public func transition(currentState: String?, inputKey: String) -> String? {
+    public func transition(currentState: String?, inputKey: String) -> TransitionInfo? {
         let state = currentState ?? ""
         return transitionTable[state]?[inputKey]
     }
@@ -54,11 +73,17 @@ open class Automaton {
     ///   - fromState: Source state (empty string for initial state)
     ///   - inputKey: Input key that triggers transition
     ///   - toState: Destination state
-    public func addTransition(from fromState: String, input inputKey: String, to toState: String) {
+    ///   - switchTo: Optional target automaton to switch to
+    public func addTransition(
+        from fromState: String,
+        input inputKey: String,
+        to toState: String,
+        switchTo: AutomatonType? = nil,
+    ) {
         if transitionTable[fromState] == nil {
             transitionTable[fromState] = [:]
         }
-        transitionTable[fromState]?[inputKey] = toState
+        transitionTable[fromState]?[inputKey] = TransitionInfo(toState: toState, switchTo: switchTo)
 
         // Track valid states
         validStates.insert(fromState)
@@ -72,14 +97,6 @@ open class Automaton {
     public func addDisplay(state: String, display: String) {
         displayTable[state] = display
         validStates.insert(state)
-    }
-
-    /// Batch add transitions for performance
-    /// - Parameter transitions: Array of (fromState, inputKey, toState) tuples
-    public func addTransitions(_ transitions: [(from: String, input: String, to: String)]) {
-        for transition in transitions {
-            addTransition(from: transition.from, input: transition.input, to: transition.to)
-        }
     }
 
     /// Batch add display mappings for performance

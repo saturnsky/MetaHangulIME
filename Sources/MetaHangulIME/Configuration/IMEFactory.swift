@@ -105,10 +105,12 @@ private extension IMEFactory {
 
         // 전이 추가
         for transition in definition.transitions {
+            let switchTo = transition.switchTo.flatMap { AutomatonType(rawValue: $0) }
             automaton.addTransition(
                 from: transition.from,
                 input: transition.input,
-                to: transition.to
+                to: transition.to,
+                switchTo: switchTo
             )
         }
 
@@ -124,10 +126,12 @@ private extension IMEFactory {
         let automaton = JungseongAutomaton()
 
         for transition in definition.transitions {
+            let switchTo = transition.switchTo.flatMap { AutomatonType(rawValue: $0) }
             automaton.addTransition(
                 from: transition.from,
                 input: transition.input,
-                to: transition.to
+                to: transition.to,
+                switchTo: switchTo
             )
         }
 
@@ -142,10 +146,12 @@ private extension IMEFactory {
         let automaton = JongseongAutomaton()
 
         for transition in definition.transitions {
+            let switchTo = transition.switchTo.flatMap { AutomatonType(rawValue: $0) }
             automaton.addTransition(
                 from: transition.from,
                 input: transition.input,
-                to: transition.to
+                to: transition.to,
+                switchTo: switchTo
             )
         }
 
@@ -199,10 +205,12 @@ private extension IMEFactory {
         let automaton = NonJamoAutomaton()
 
         for transition in definition.transitions {
+            let switchTo = transition.switchTo.flatMap { AutomatonType(rawValue: $0) }
             automaton.addTransition(
                 from: transition.from,
                 input: transition.input,
-                to: transition.to
+                to: transition.to,
+                switchTo: switchTo
             )
         }
 

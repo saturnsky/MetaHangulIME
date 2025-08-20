@@ -15,6 +15,7 @@ public struct InputProcessorConfig {
     public let transitionCommitPolicy: TransitionCommitPolicy
     public let displayMode: DisplayMode
     public let supportStandaloneCluster: Bool
+    public let newSyllableOrder: [JamoPosition]
 
     public init(
         orderMode: OrderMode = .sequential,
@@ -22,7 +23,8 @@ public struct InputProcessorConfig {
         nonJamoCommitPolicy: NonJamoCommitPolicy = .onComplete,
         transitionCommitPolicy: TransitionCommitPolicy = .always,
         displayMode: DisplayMode = .modernMultiple,
-        supportStandaloneCluster: Bool = false
+        supportStandaloneCluster: Bool = false,
+        newSyllableOrder: [JamoPosition] = [.choseong, .jungseong, .jongseong]
     ) {
         self.orderMode = orderMode
         self.jamoCommitPolicy = jamoCommitPolicy
@@ -30,6 +32,7 @@ public struct InputProcessorConfig {
         self.transitionCommitPolicy = transitionCommitPolicy
         self.displayMode = displayMode
         self.supportStandaloneCluster = supportStandaloneCluster
+        self.newSyllableOrder = newSyllableOrder
     }
 }
 
@@ -158,13 +161,81 @@ public final class InputProcessor {
         return automaton.canTransition(from: state)
     }
 
-    /// 입력 키 통합 처리
-    public func process(
+    /// Jamo 오토마타에서 오토마타 스위치가 일어나는 경우인지 확인
+    /// Non-Jamo 상태의 경우 이미 확인이 되어 있음
+    public func trySwitchAutomaton(
+        currentState: SyllableState,
+        inputKey: VirtualKey
+    ) -> SyllableState? {
+        let allowedPositions = getAllowedPositions(for: currentState)
+
+        for position in allowedPositions {
+            guard let automaton = automatonMap[position] else { continue }
+
+            // 현재 자모 상태를 가져옴
+            let currentJamo = currentState.getJamoState(for: position)
+            if let newState = automaton.transition(
+                currentState: currentJamo,
+                inputKey: inputKey.keyIdentifier
+            ) {
+                // 오토마타 스위치가 발생하는 경우에 대한 처리
+                let newCurrent = currentState.copy()
+                // 현재 JamoPosition은 전이되기 때문에, 현재 JamoPosition 위치를 비움
+                newCurrent.setJamoState(for: position, state: nil)
+                // compositionOrder에서도 현재 JamoPosition을 제거
+                if let lastIndex = newCurrent.compositionOrder.lastIndex(of: position) {
+                    newCurrent.compositionOrder.remove(at: lastIndex)
+                }
+
+                switch newState.switchTo {
+                case .choseong:
+                    // 이미 초성 상태가 있는 경우, 전이할 수 없음. nil을 반환
+                    if newCurrent.choseongState != nil {
+                        return nil
+                    }
+                    newCurrent.addJamo(
+                        position: .choseong,
+                        state: newState.toState
+                    )
+                case .jungseong:
+                    // 이미 중성 상태가 있는 경우, 전이할 수 없음. nil을 반환
+                    if newCurrent.jungseongState != nil {
+                        return nil
+                    }
+                    newCurrent.addJamo(
+                        position: .jungseong,
+                        state: newState.toState
+                    )
+                case .jongseong:
+                    // 이미 종성 상태가 있는 경우, 전이할 수 없음. nil을 반환
+                    if newCurrent.jongseongState != nil {
+                        return nil
+                    }
+                    newCurrent.addJamo(
+                        position: .jongseong,
+                        state: newState.toState
+                    )
+                case .nonJamo:
+                    // Non-Jamo 상태로 전이된 경우, Non-Jamo 상태를 설정
+                    newCurrent.nonJamoState = newState.toState
+                    return newCurrent
+                case .none:
+                    // 그 외의 경우는 일반 시나리오니 이 함수에서 처리하지 않음
+                    return nil
+                }
+            }
+        }
+
+        return nil
+    }
+
+    /// 기본적인 전이가 발생하는지를 확인
+    /// .empty 및 .nonJamo에서 시작하는 케이스는 이 함수에서 처리됨
+    public func tryBasicProcess(
         previousState: SyllableState?,
         currentState: SyllableState,
         inputKey: VirtualKey
-    ) -> ProcessResult {
-        // 현재 상태를 확인
+    ) -> ProcessResult? {
         let currentJamoState: JamoState = currentState.isEmpty ? .empty : currentState.hasJamo ? .jamo : .nonJamo
         if currentJamoState == .empty {
             // 현재 상태가 비어있으면 새 음절 생성
@@ -182,7 +253,32 @@ public final class InputProcessor {
                 inputKey: inputKey.keyIdentifier
             ) {
                 let newState = currentState.copy()
-                newState.nonJamoState = newSpecialFromCurrent
+                // Non-Jamo 상태에서 다른 오토마타로 전이되는 경우를 처리
+                // 예: Non-Jamo -> Choseong
+                newState.nonJamoState = nil
+                switch newSpecialFromCurrent.switchTo {
+                case .choseong:
+                    newState.addJamo(
+                        position: .choseong,
+                        state: newSpecialFromCurrent.toState
+                    )
+                case .jungseong:
+                    newState.addJamo(
+                        position: .jungseong,
+                        state: newSpecialFromCurrent.toState
+                    )
+                case .jongseong:
+                    newState.addJamo(
+                        position: .jongseong,
+                        state: newSpecialFromCurrent.toState
+                    )
+                case .nonJamo:
+                    // Non-Jamo 상태로 전이된 경우, Non-Jamo 상태를 유지
+                    newState.nonJamoState = newSpecialFromCurrent.toState
+                case .none:
+                    // 전이 대상이 없는 경우, Non-Jamo 상태를 유지
+                    newState.nonJamoState = newSpecialFromCurrent.toState
+                }
                 return ProcessResult(
                     needAutoCommit: false,
                     previousState: previousState,
@@ -208,7 +304,40 @@ public final class InputProcessor {
                 cursorMovement: 1
             )
         }
+        return nil
+    }
+
+    /// 입력 키 통합 처리
+    public func process(
+        previousState: SyllableState?,
+        currentState: SyllableState,
+        inputKey: VirtualKey
+    ) -> ProcessResult {
+        // 현재 상태를 확인
+        let currentJamoState: JamoState = currentState.isEmpty ? .empty : currentState.hasJamo ? .jamo : .nonJamo
+        if let basicResult: ProcessResult = tryBasicProcess(
+            previousState: previousState,
+            currentState: currentState,
+            inputKey: inputKey
+        ) {
+            return basicResult
+        }
+
         // 이 아래는 현재 상태가 Jamo인 경우
+        // 우선 오토마타 스위치가 일어나는 상황인지를 최우선적으로 확인
+        if let newState = trySwitchAutomaton(
+            currentState: currentState,
+            inputKey: inputKey
+        ) {
+            // 오토마타 스위치가 발생한 경우, 해당 스위치에 따라 전이를 발생시키고 종료
+            // 오토마타 스위치가 일어나는 경우는 자동 커밋 요건을 체크하지 않음
+            return ProcessResult(
+                needAutoCommit: false,
+                previousState: previousState,
+                currentState: newState,
+                cursorMovement: 0
+            )
+        }
 
         // 종성부용초성 모드가 켜져 있을 경우, 종성부용초성 조건을 먼저 확인
         if config.supportStandaloneCluster &&
@@ -284,7 +413,7 @@ public final class InputProcessor {
             currentState: choseong,
             inputKey: inputKey.keyIdentifier
         ) {
-            newState.addJamo(position: .choseong, state: newChoseong)
+            newState.addJamo(position: .choseong, state: newChoseong.toState)
             return newState
         }
 
@@ -294,7 +423,7 @@ public final class InputProcessor {
             inputKey: inputKey.keyIdentifier
         ) {
             // 종성으로 재해석
-            newState.jongseongState = jongseong
+            newState.jongseongState = jongseong.toState
             newState.choseongState = nil
             newState.compositionOrder = [.jongseong]
             return newState
@@ -319,7 +448,7 @@ public final class InputProcessor {
                 inputKey: inputKey.keyIdentifier
             ) {
                 let newCurrent = currentState.copy()
-                newCurrent.addJamo(position: position, state: newState)
+                newCurrent.addJamo(position: position, state: newState.toState)
                 return newCurrent
             }
         }
@@ -430,7 +559,7 @@ public final class InputProcessor {
                 currentState: nil,
                 inputKey: inputIdentifier
             ) {
-                newCurrent.jungseongState = jungseong
+                newCurrent.jungseongState = jungseong.toState
                 newCurrent.compositionOrder.append(.jungseong)
             }
         } else {
@@ -453,18 +582,18 @@ public final class InputProcessor {
         // 우선 Non-Jamo 오토마타부터 확인
         if let nonJamoState = nonJamoAutomaton?.transition(currentState: nil, inputKey: inputKey.keyIdentifier) {
             // Non-Jamo 오토마타로 조합 가능한 경우, Non-Jamo 상태로 새 음절 생성
-            newState.nonJamoState = nonJamoState
+            newState.nonJamoState = nonJamoState.toState
             return newState
         }
 
-        // 순서대로 확인: 초성, 중성, 종성
-        // 이렇게 하면 새 음절 시작 시 자음이 먼저 초성으로 감
-        let orderedPositions: [JamoPosition] = [.choseong, .jungseong, .jongseong]
+        // 설정에서 지정한 순서대로 확인 (기본값: 초성, 중성, 종성)
+        // 이렇게 하면 새 음절 시작 시 자음이 설정된 우선순위에 따라 처리됨
+        let orderedPositions: [JamoPosition] = config.newSyllableOrder
 
         for position in orderedPositions {
             guard let automaton = automatonMap[position] else { continue }
             if let state = automaton.transition(currentState: nil, inputKey: inputKey.keyIdentifier) {
-                newState.addJamo(position: position, state: state)
+                newState.addJamo(position: position, state: state.toState)
                 break
             }
         }
@@ -576,7 +705,7 @@ public final class InputProcessor {
                 currentState: prevJong,
                 inputKey: currentCho
             ) {
-                prev.jongseongState = combined
+                prev.jongseongState = combined.toState
                 // 현재 음절이 소비되고 이전 음절이 업데이트됨
                 // 수정된 이전 상태를 새로운 현재 상태로 반환
                 return BackspaceProcessResult(previousState: nil, currentState: prev)
