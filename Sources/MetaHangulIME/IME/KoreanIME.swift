@@ -22,6 +22,47 @@ public protocol KoreanIMEDelegate: AnyObject {
     func koreanIME(_ ime: KoreanIME, requestBackspace: Void)
 }
 
+/// 현재 IME 상태 정보를 외부에 제공하기 위한 구조체
+/// 외부 입력기에서 조건절 평가 등에 사용할 수 있음
+public struct StateInfo {
+    /// 초성이 존재하는지 여부
+    public let hasChoseong: Bool
+    /// 중성이 존재하는지 여부
+    public let hasJungseong: Bool
+    /// 종성이 존재하는지 여부
+    public let hasJongseong: Bool
+    /// 비자모 상태가 존재하는지 여부
+    public let hasNonJamo: Bool
+    /// 현재 초성 상태 값 (없으면 nil)
+    public let choseongValue: String?
+    /// 현재 중성 상태 값 (없으면 nil)
+    public let jungseongValue: String?
+    /// 현재 종성 상태 값 (없으면 nil)
+    public let jongseongValue: String?
+    /// 현재 비자모 상태 값 (없으면 nil)
+    public let nonJamoValue: String?
+
+    public init(
+        hasChoseong: Bool,
+        hasJungseong: Bool,
+        hasJongseong: Bool,
+        hasNonJamo: Bool,
+        choseongValue: String?,
+        jungseongValue: String?,
+        jongseongValue: String?,
+        nonJamoValue: String?
+    ) {
+        self.hasChoseong = hasChoseong
+        self.hasJungseong = hasJungseong
+        self.hasJongseong = hasJongseong
+        self.hasNonJamo = hasNonJamo
+        self.choseongValue = choseongValue
+        self.jungseongValue = jungseongValue
+        self.jongseongValue = jongseongValue
+        self.nonJamoValue = nonJamoValue
+    }
+}
+
 // swiftlint:disable type_body_length
 /// 메타 한글 프레임워크를 사용하는 한국어 IME의 추상 베이스 클래스
 ///
@@ -238,6 +279,22 @@ open class KoreanIME {
             }
             return !currentState.isEmpty
         }
+    }
+
+    /// 현재 상태 정보를 가져옴
+    /// - Returns: 현재 조합 중인 음절의 상태 정보
+    /// - Note: 이 메서드는 외부 입력기에서 조건절 평가 등에 사용할 수 있습니다
+    public func getCurrentStateInfo() -> StateInfo {
+        StateInfo(
+            hasChoseong: currentState.choseongState != nil,
+            hasJungseong: currentState.jungseongState != nil,
+            hasJongseong: currentState.jongseongState != nil,
+            hasNonJamo: currentState.nonJamoState != nil,
+            choseongValue: currentState.choseongState,
+            jungseongValue: currentState.jungseongState,
+            jongseongValue: currentState.jongseongState,
+            nonJamoValue: currentState.nonJamoState
+        )
     }
 
     // MARK: - Private 메서드

@@ -60,6 +60,17 @@ let composing = ime.getComposingText()
 
 // IME 초기화
 ime.reset()
+
+// 현재 IME 상태 정보 조회
+let stateInfo = ime.getCurrentStateInfo()
+// stateInfo.hasChoseong: Bool - 초성 존재 여부
+// stateInfo.hasJungseong: Bool - 중성 존재 여부  
+// stateInfo.hasJongseong: Bool - 종성 존재 여부
+// stateInfo.hasNonJamo: Bool - 비자모 존재 여부
+// stateInfo.choseongValue: String? - 현재 초성 값
+// stateInfo.jungseongValue: String? - 현재 중성 값
+// stateInfo.jongseongValue: String? - 현재 종성 값
+// stateInfo.nonJamoValue: String? - 현재 비자모 값
 ```
 
 ### Delegate 구현
@@ -214,6 +225,18 @@ public struct InputProcessorConfig {
     public let displayMode: DisplayMode
     public let supportStandaloneCluster: Bool
 }
+
+// IME 상태 정보
+public struct StateInfo {
+    public let hasChoseong: Bool      // 초성 존재 여부
+    public let hasJungseong: Bool     // 중성 존재 여부
+    public let hasJongseong: Bool     // 종성 존재 여부
+    public let hasNonJamo: Bool       // 비자모 존재 여부
+    public let choseongValue: String? // 현재 초성 값
+    public let jungseongValue: String? // 현재 중성 값
+    public let jongseongValue: String? // 현재 종성 값
+    public let nonJamoValue: String?  // 현재 비자모 값
+}
 ```
 
 ### 오토마타 시스템
@@ -350,6 +373,29 @@ class MyCustomIME: KoreanIME {
 ```
 
 ## 고급 기능
+
+### 상태 조회 기능
+
+`getCurrentStateInfo()` 메서드를 통해 현재 IME의 내부 상태를 조회할 수 있습니다. 이는 외부 입력기 확장이나 조건부 처리 로직 구현 시 유용합니다:
+
+```swift
+let stateInfo = ime.getCurrentStateInfo()
+
+// 초성만 있는 경우 실행할 로직
+if stateInfo.hasChoseong && !stateInfo.hasJungseong {
+    // 초성 단독 입력시 처리
+}
+
+// 현재 조합 중인 자모 값 확인
+if let choseong = stateInfo.choseongValue {
+    print("현재 초성: \(choseong)")
+}
+
+// 조건부 입력 처리 예시
+if stateInfo.hasJongseong && stateInfo.jongseongValue == "ㄳ" {
+    // 겹받침 ㄳ이 있을 때의 처리
+}
+```
 
 ### 도깨비불 현상
 종성이 다음 음절의 초성으로 이동하는 현상:
