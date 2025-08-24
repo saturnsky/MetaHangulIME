@@ -239,7 +239,15 @@ public final class InputProcessor {
         let currentJamoState: JamoState = currentState.isEmpty ? .empty : currentState.hasJamo ? .jamo : .nonJamo
         if currentJamoState == .empty {
             // 현재 상태가 비어있으면 새 음절 생성
-            let newState: SyllableState = createNewSyllableWithInput(inputKey: inputKey)
+            guard let newState = createNewSyllableWithInput(inputKey: inputKey) else {
+                // 새 음절 생성이 불가능한 경우, 현재 상태 유지
+                return ProcessResult(
+                    needAutoCommit: false,
+                    previousState: previousState,
+                    currentState: currentState,
+                    cursorMovement: 0
+                )
+            }
             return ProcessResult(
                 needAutoCommit: false,
                 previousState: previousState,
@@ -287,7 +295,15 @@ public final class InputProcessor {
                 )
             }
             // Non-Jamo 상태에서 전이가 불가능한 경우, 새 음절 생성
-            let newState: SyllableState = createNewSyllableWithInput(inputKey: inputKey)
+            guard let newState = createNewSyllableWithInput(inputKey: inputKey) else {
+                // 새 음절 생성이 불가능한 경우, 현재 상태 유지
+                return ProcessResult(
+                    needAutoCommit: false,
+                    previousState: previousState,
+                    currentState: currentState,
+                    cursorMovement: 0
+                )
+            }
             if config.transitionCommitPolicy == .always && newState.hasJamo {
                 // 새로 입력된 키가 Jamo일 경우, transition이 발생하였으니 커밋 처리
                 return ProcessResult(
@@ -370,7 +386,15 @@ public final class InputProcessor {
         }
 
         // 모든 조건에 해당하지 않을 경우 새 음절을 생성
-        let newState = createNewSyllableWithInput(inputKey: inputKey)
+        guard let newState = createNewSyllableWithInput(inputKey: inputKey) else {
+            // 새 음절 생성이 불가능한 경우, 현재 상태 유지
+            return ProcessResult(
+                needAutoCommit: false,
+                previousState: previousState,
+                currentState: currentState,
+                cursorMovement: 0
+            )
+        }
 
         if currentJamoState == .empty {
             return ProcessResult(
@@ -576,13 +600,17 @@ public final class InputProcessor {
         )
     }
 
-    private func createNewSyllableWithInput(inputKey: VirtualKey) -> SyllableState {
+    private func createNewSyllableWithInput(inputKey: VirtualKey) -> SyllableState? {
         let newState = SyllableState()
 
         // 우선 Non-Jamo 오토마타부터 확인
         if let nonJamoState = nonJamoAutomaton?.transition(currentState: nil, inputKey: inputKey.keyIdentifier) {
             // Non-Jamo 오토마타로 조합 가능한 경우, Non-Jamo 상태로 새 음절 생성
             newState.nonJamoState = nonJamoState.toState
+            if newState.isEmpty {
+                // Non-Jamo 상태가 비어있으면 nil 반환
+                return nil
+            }
             return newState
         }
 
@@ -601,6 +629,10 @@ public final class InputProcessor {
         if newState.isEmpty {
             // 입력된 키가 어떤 자모로도 조합되지 않는 경우, Non-Jamo 상태로 설정
             newState.nonJamoState = inputKey.keyIdentifier
+        }
+        if newState.isEmpty {
+            // Non-Jamo 상태가 비어있으면 nil 반환
+            return nil
         }
 
         return newState

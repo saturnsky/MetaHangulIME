@@ -233,7 +233,7 @@ automata:
       # 표준 도깨비불 분리
       - { jongseong: "ㄳ", remaining: "ㄱ", moved: "ㅅ" }
       - { jongseong: "ㄵ", remaining: "ㄴ", moved: "ㅈ" }
-      - { jongseong: "ㅀ", remaining: "ㄴ", moved: "ㅎ" }
+      - { jongseong: "ㄶ", remaining: "ㄴ", moved: "ㅎ" }
       - { jongseong: "ㄺ", remaining: "ㄹ", moved: "ㄱ" }
       - { jongseong: "ㄻ", remaining: "ㄹ", moved: "ㅁ" }
       - { jongseong: "ㄼ", remaining: "ㄹ", moved: "ㅂ" }
