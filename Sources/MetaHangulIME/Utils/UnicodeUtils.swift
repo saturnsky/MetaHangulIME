@@ -28,6 +28,55 @@ public enum UnicodeConstants {
 
 /// 한국어 유니코드 연산을 위한 유틸리티
 public enum UnicodeUtils {
+    /// 두 자모를 단일 호환 자모로 변환하는 테이블 (위치별 구분)
+    private static let doubleJamoCompositionMap: (
+        choseong: [String: Character],
+        jungseong: [String: Character],
+        jongseong: [String: Character]
+    ) = (
+        choseong: [
+            // 초성 쌍자음
+            "\u{1100}\u{1100}": "\u{3132}",  // ᄀᄀ → ㄲ
+            "\u{1103}\u{1103}": "\u{3138}",  // ᄃᄃ → ㄸ
+            "\u{1107}\u{1107}": "\u{3143}",  // ᄇᄇ → ㅃ
+            "\u{1109}\u{1109}": "\u{3146}",  // ᄉᄉ → ㅆ
+            "\u{110C}\u{110C}": "\u{3149}",  // ᄌᄌ → ㅉ
+        ],
+
+        jungseong: [
+            // 중성 조합
+            "\u{1169}\u{1161}": "\u{3158}",  // ㅗㅏ → ㅘ
+            "\u{1169}\u{1162}": "\u{3159}",  // ㅗㅐ → ㅙ
+            "\u{1169}\u{1175}": "\u{315A}",  // ㅗㅣ → ㅚ
+            "\u{116E}\u{1165}": "\u{315D}",  // ㅜㅓ → ㅝ
+            "\u{116E}\u{1166}": "\u{315E}",  // ㅜㅔ → ㅞ
+            "\u{116E}\u{1175}": "\u{315F}",  // ㅜㅣ → ㅟ
+            "\u{1173}\u{1175}": "\u{3162}",  // ㅡㅣ → ㅢ
+        ],
+
+        jongseong: [
+            // 종성 쌍자음
+            "\u{11A8}\u{11A8}": "\u{3132}",  // ᆨᆨ → ㄲ
+            "\u{11AE}\u{11AE}": "\u{3138}",  // ᆮᆮ → ㄸ
+            "\u{11B8}\u{11B8}": "\u{3143}",  // ᆸᆸ → ㅃ
+            "\u{11BA}\u{11BA}": "\u{3146}",  // ᆺᆺ → ㅆ
+            "\u{11BD}\u{11BD}": "\u{3149}",  // ᆽᆽ → ㅉ
+
+            // 종성 복합 자음
+            "\u{11A8}\u{11BA}": "\u{3133}",  // ᆨᆺ → ㄳ
+            "\u{11AB}\u{11BD}": "\u{3135}",  // ᆫᆽ → ㄵ
+            "\u{11AB}\u{11C2}": "\u{3136}",  // ᆫᇂ → ㄶ
+            "\u{11AF}\u{11A8}": "\u{313A}",  // ᆯᆨ → ㄺ
+            "\u{11AF}\u{11B7}": "\u{313B}",  // ᆯᆷ → ㄻ
+            "\u{11AF}\u{11B8}": "\u{313C}",  // ᆯᆸ → ㄼ
+            "\u{11AF}\u{11BA}": "\u{313D}",  // ᆯᆺ → ㄽ
+            "\u{11AF}\u{11C0}": "\u{313E}",  // ᆯᇀ → ㄾ
+            "\u{11AF}\u{11C1}": "\u{313F}",  // ᆯᇁ → ㄿ
+            "\u{11AF}\u{11C2}": "\u{3140}",  // ᆯᇂ → ㅀ
+            "\u{11B8}\u{11BA}": "\u{3144}",  // ᆸᆺ → ㅄ
+        ]
+    )
+
     /// 자모에서 호환 자모로의 매핑 테이블
     /// O(1) 조회 성능을 위해 정적 배열로 최적화
     private static let jamoToCompatibilityMap: [Character: Character] = {
@@ -120,6 +169,50 @@ public enum UnicodeUtils {
             let char = Character(scalar)
             return jamoToCompatibilityMap[char] ?? char
         })
+    }
+
+    /// 한글 자모를 호환 자모로 변환 (2자 조합 우선 처리)
+    /// - Parameters:
+    ///   - jamo: 변환할 자모 문자열
+    ///   - position: 자모의 위치 (초성/중성/종성)
+    /// - Returns: 변환된 호환 자모 문자열
+    public static func jamoToCompatibilityWithComposition(_ jamo: String, position: JamoPosition) -> String {
+        var result = ""
+        let scalars = jamo.unicodeScalars
+        var i = scalars.startIndex
+
+        // position에 따라 적절한 테이블 선택
+        let compositionMap: [String: Character]
+        switch position {
+        case .choseong:
+            compositionMap = doubleJamoCompositionMap.choseong
+        case .jungseong:
+            compositionMap = doubleJamoCompositionMap.jungseong
+        case .jongseong:
+            compositionMap = doubleJamoCompositionMap.jongseong
+        }
+
+        while i < scalars.endIndex {
+            // 다음 스칼라가 있으면 2스칼라 조합 시도
+            let nextIndex = scalars.index(after: i)
+            if nextIndex < scalars.endIndex {
+                let twoScalars = String(scalars[i...nextIndex])
+
+                if let composed = compositionMap[twoScalars] {
+                    result.append(composed)
+                    i = scalars.index(i, offsetBy: 2)
+                    continue
+                }
+            }
+
+            // 2스칼라 조합 실패시 단일 스칼라 변환
+            let singleScalar = String(scalars[i])
+            let char = Character(singleScalar)
+            result.append(jamoToCompatibilityMap[char] ?? char)
+            i = scalars.index(after: i)
+        }
+
+        return result
     }
 
     /// 문자가 한글 자모 범위에 있는지 확인

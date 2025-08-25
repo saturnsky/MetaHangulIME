@@ -46,7 +46,7 @@ public enum HangulComposer {
                     // 첫 번째 유니코드 스칼라 제거
                     let index = remainingCho.unicodeScalars.index(after: remainingCho.unicodeScalars.startIndex)
                     remainingCho = String(remainingCho.unicodeScalars[index...])
-                    // Python 버전 호환성: 남은 초성이 있으면 중단하고 반환
+                    // 남은 초성이 있으면 중단하고 반환
                     if !remainingCho.isEmpty {
                         return buildResult(
                             composeIndex: composeIndex,
@@ -214,38 +214,61 @@ public enum HangulComposer {
         return CompositionResult(composed: nil, remaining: remaining)
     }
 
-    private static func buildCompatibilityResult(cho: String, jung: String, jong: String) -> CompositionResult {
-        // 첫 번째 문자를 호환 자모로 변환
-        if let firstChar = cho.first {
-            let firstCharStr = String(firstChar)
-            let compatChar = UnicodeUtils.jamoToCompatibility(firstCharStr)
-
-            var remaining = cho
-            remaining.removeFirst()
-            let remainingState = buildRemainingState(cho: remaining, jung: jung, jong: jong)
-
-            return CompositionResult(composed: compatChar, remaining: remainingState)
-        } else if let firstChar = jung.first {
-            let firstCharStr = String(firstChar)
-            let compatChar = UnicodeUtils.jamoToCompatibility(firstCharStr)
-
-            var remaining = jung
-            remaining.removeFirst()
-            let remainingState = buildRemainingState(cho: cho, jung: remaining, jong: jong)
-
-            return CompositionResult(composed: compatChar, remaining: remainingState)
-        } else if let firstChar = jong.first {
-            let firstCharStr = String(firstChar)
-            let compatChar = UnicodeUtils.jamoToCompatibility(firstCharStr)
-
-            var remaining = jong
-            remaining.removeFirst()
-            let remainingState = buildRemainingState(cho: cho, jung: jung, jong: remaining)
-
-            return CompositionResult(composed: compatChar, remaining: remainingState)
+    public static func buildCompatibilityResult(cho: String, jung: String, jong: String) -> CompositionResult {
+        // 처리 우선순위: 초성 → 중성 → 종성
+        if !cho.isEmpty {
+            let (composed, remaining) = extractAndCompose(from: cho, position: .choseong)
+            let remainingState = buildRemainingState(
+                cho: remaining,
+                jung: jung,
+                jong: jong
+            )
+            return CompositionResult(composed: composed, remaining: remainingState)
+        } else if !jung.isEmpty {
+            let (composed, remaining) = extractAndCompose(from: jung, position: .jungseong)
+            let remainingState = buildRemainingState(
+                cho: cho,
+                jung: remaining,
+                jong: jong
+            )
+            return CompositionResult(composed: composed, remaining: remainingState)
+        } else if !jong.isEmpty {
+            let (composed, remaining) = extractAndCompose(from: jong, position: .jongseong)
+            let remainingState = buildRemainingState(
+                cho: cho,
+                jung: jung,
+                jong: remaining
+            )
+            return CompositionResult(composed: composed, remaining: remainingState)
         }
 
         return CompositionResult(composed: nil, remaining: nil)
+    }
+
+    private static func extractAndCompose(from jamo: String, position: JamoPosition) ->
+        (composed: String, remaining: String) {
+        // 빈 문자열 처리
+        guard !jamo.isEmpty else {
+            return ("", "")
+        }
+        let jamoScalars = jamo.unicodeScalars
+
+        // 2문자 이상인 경우 조합 시도
+        if jamoScalars.count >= 2 {
+            let twoChars = String(jamoScalars.prefix(2))
+            // jamoToCompatibilityWithComposition이 내부적으로 2자 조합을 처리
+            let composed = UnicodeUtils.jamoToCompatibilityWithComposition(twoChars, position: position)
+
+            // 조합이 성공했는지 확인 (2자가 1자로 변환되었는지)
+            if composed.count == 1 {
+                return (composed, String(jamoScalars.dropFirst(2)))
+            }
+        }
+
+        // 2자 조합 실패 또는 1자만 있는 경우
+        let firstChar = String(jamoScalars.prefix(1))
+        let composed = UnicodeUtils.jamoToCompatibility(firstChar)
+        return (composed, String(jamoScalars.dropFirst(1)))
     }
 
     private static func buildRemainingState(cho: String, jung: String, jong: String) -> SyllableDisplayState? {

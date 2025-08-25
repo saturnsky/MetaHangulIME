@@ -76,22 +76,23 @@ public final class DisplayBuilder {
         var cho = state.choseongState.map { choseongAutomaton.display($0) } ?? ""
         var jung = state.jungseongState.map { jungseongAutomaton.display($0) } ?? ""
         var jong = state.jongseongState.map { jongseongAutomaton.display($0) } ?? ""
+        let (composed, remaining) = tryComposeSyllable(cho: cho, jung: jung, jong: jong)
+
+        if remaining == nil {
+            // 모든 자모가 조합된 경우(남은 상태 없음) 조합된 결과 반환
+            return composed ?? ""
+        }
+        cho = remaining?.remainingChoseong ?? ""
+        jung = remaining?.remainingJungseong ?? ""
+        jong = remaining?.remainingJongseong ?? ""
+        result += composed ?? ""
 
         while !cho.isEmpty || !jung.isEmpty || !jong.isEmpty {
-            let (composed, remaining) = tryComposeSyllable(cho: cho, jung: jung, jong: jong)
-
-            if let composed = composed {
-                result += composed
-            }
-
-            if let remaining = remaining {
-                // 남은 상태는 이미 상태 이름이 아닌 표시 문자열을 포함
-                cho = remaining.remainingChoseong ?? ""
-                jung = remaining.remainingJungseong ?? ""
-                jong = remaining.remainingJongseong ?? ""
-            } else {
-                break
-            }
+            let compatibilityResult = HangulComposer.buildCompatibilityResult(cho: cho, jung: jung, jong: jong)
+            result += compatibilityResult.composed ?? ""
+            cho = compatibilityResult.remaining?.remainingChoseong ?? ""
+            jung = compatibilityResult.remaining?.remainingJungseong ?? ""
+            jong = compatibilityResult.remaining?.remainingJongseong ?? ""
         }
 
         return result
