@@ -36,6 +36,24 @@ public struct ProcessorConfig: Codable {
         case newSyllableOrder
     }
 
+    public init(
+        orderMode: String,
+        jamoCommitPolicy: String,
+        nonJamoCommitPolicy: String,
+        transitionCommitPolicy: String,
+        displayMode: String,
+        supportStandaloneCluster: Bool,
+        newSyllableOrder: [String]? = nil
+    ) {
+        self.orderMode = orderMode
+        self.jamoCommitPolicy = jamoCommitPolicy
+        self.nonJamoCommitPolicy = nonJamoCommitPolicy
+        self.transitionCommitPolicy = transitionCommitPolicy
+        self.displayMode = displayMode
+        self.supportStandaloneCluster = supportStandaloneCluster
+        self.newSyllableOrder = newSyllableOrder
+    }
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         orderMode = try container.decode(String.self, forKey: .orderMode)
@@ -45,6 +63,17 @@ public struct ProcessorConfig: Codable {
         displayMode = try container.decode(String.self, forKey: .displayMode)
         supportStandaloneCluster = try container.decode(Bool.self, forKey: .supportStandaloneCluster)
         newSyllableOrder = try container.decodeIfPresent([String].self, forKey: .newSyllableOrder)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(orderMode, forKey: .orderMode)
+        try container.encode(jamoCommitPolicy, forKey: .jamoCommitPolicy)
+        try container.encode(nonJamoCommitPolicy, forKey: .nonJamoCommitPolicy)
+        try container.encode(transitionCommitPolicy, forKey: .transitionCommitPolicy)
+        try container.encode(displayMode, forKey: .displayMode)
+        try container.encode(supportStandaloneCluster, forKey: .supportStandaloneCluster)
+        try container.encodeIfPresent(newSyllableOrder, forKey: .newSyllableOrder)
     }
 }
 

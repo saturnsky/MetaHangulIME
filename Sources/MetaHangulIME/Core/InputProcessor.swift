@@ -543,18 +543,24 @@ public final class InputProcessor {
         let inputIdentifier = inputKey.keyIdentifier
         var dokkaebiResult: DokkaebiResult?
         var isJungseongDokkaebi = false
+        var pendingJungseongTransition: Automaton.TransitionInfo?
 
-        // 중성-도깨비불 체크 (입력키가 중성으로 전이 가능한 경우)
-        if jungseongAutomaton.transition(currentState: nil, inputKey: inputIdentifier) != nil {
+        // 중성-도깨비불 체크 (도깨비불 전이가 정의된 경우)
+        if dokkaebi.canSplitForJungseong(jongseong) {
             let result = dokkaebi.processJungseongDokkaebi(jongseong)
-            if result.shouldSplit {
+            if result.shouldSplit,
+               let jungseongTransition = jungseongAutomaton.transition(
+                    currentState: nil,
+                    inputKey: inputIdentifier
+               ) {
                 dokkaebiResult = result
                 isJungseongDokkaebi = true
+                pendingJungseongTransition = jungseongTransition
             }
         }
 
-        // 초성-도깨비불 체크 (입력키가 초성으로 전이 가능한 경우)
-        if dokkaebiResult == nil && choseongAutomaton.transition(currentState: nil, inputKey: inputIdentifier) != nil {
+        // 초성-도깨비불 체크 (도깨비불 전이가 정의된 경우)
+        if dokkaebiResult == nil && dokkaebi.canSplitForChoseong(jongseong, inputKey: inputIdentifier) {
             let result = dokkaebi.processChoseongDokkaebi(jongseong, inputKey: inputIdentifier)
             if result.shouldSplit {
                 dokkaebiResult = result
@@ -579,12 +585,11 @@ public final class InputProcessor {
 
         if isJungseongDokkaebi {
             // 중성-도깨비불: 입력된 중성 낱자를 추가
-            if let jungseong = jungseongAutomaton.transition(
-                currentState: nil,
-                inputKey: inputIdentifier
-            ) {
+            if let jungseong = pendingJungseongTransition {
                 newCurrent.jungseongState = jungseong.toState
                 newCurrent.compositionOrder.append(.jungseong)
+            } else {
+                return nil
             }
         } else {
             // 초성-도깨비불: 결과를 그대로 반영
