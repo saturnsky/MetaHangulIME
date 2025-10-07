@@ -22,46 +22,94 @@ public struct BackspaceResult {
 /// This automaton defines how compound jamo (like ㄲ, ㅘ, ㄳ) decompose
 /// when backspace is pressed, or whether they should be deleted entirely.
 public class BackspaceAutomaton {
-    /// Transition table: current_state -> new_state (nil for deletion)
-    /// Using dictionary for O(1) lookup
-    private var transitionTable: [String: String?] = [:]
+    // MARK: - Pattern Support
+
+    /// Compiled backspace pattern
+    private struct BackspacePattern {
+        let fromPattern: Automaton.FromPattern
+        let toPattern: Automaton.ToPattern?  // nil = complete deletion
+    }
+
+    // MARK: - Storage
+
+    /// Tier 1: Exact match transition table: current_state -> new_state (nil for deletion)
+    private var exactTransitions: [String: String?] = [:]
+
+    /// Tier 2: Pattern match transitions
+    private var patterns: [BackspacePattern] = []
+
+    /// Temporary automaton instance for pattern parsing
+    private let patternParser = Automaton()
 
     public init() {}
 
     /// Add a backspace transition
     /// - Parameters:
-    ///   - fromState: Current state
-    ///   - toState: State after backspace (nil for complete deletion)
+    ///   - fromState: Current state (supports pattern like "{:3}ㅅ")
+    ///   - toState: State after backspace (nil for complete deletion, supports pattern like "{:2}")
     public func addTransition(from fromState: String, to toState: String?) {
-        transitionTable[fromState] = toState
+        // Parse patterns
+        let fromPattern = patternParser.parseFromPattern(fromState)
+        let toPattern = toState.map { patternParser.parseToPattern($0) }
+
+        // Check if exact match
+        if fromPattern.isExact {
+            // Tier 1: Exact match
+            exactTransitions[fromState] = toState
+        } else {
+            // Tier 2: Pattern match
+            patterns.append(BackspacePattern(
+                fromPattern: fromPattern,
+                toPattern: toPattern
+            ))
+        }
     }
 
     /// Process backspace for given state
     /// - Parameter currentState: Current jamo state
     /// - Returns: BackspaceResult with new state
     public func process(_ currentState: String) -> BackspaceResult {
-        // If not in transition table, default to complete deletion
-        // Using if-let to properly handle String?? type from dictionary
-        if let transition = transitionTable[currentState] {
+        // Tier 1: Exact match
+        if let transition = exactTransitions[currentState] {
             return BackspaceResult(newState: transition)
-        } else {
-            return BackspaceResult(newState: nil)
         }
+
+        // Tier 2: Pattern match
+        for pattern in patterns {
+            if let captured = pattern.fromPattern.match(state: currentState) {
+                let newState = pattern.toPattern?.apply(captured: captured)
+                return BackspaceResult(newState: newState)
+            }
+        }
+
+        // Default: complete deletion
+        return BackspaceResult(newState: nil)
     }
 
     /// Check if state has a backspace transition
     /// - Parameter state: State to check
     /// - Returns: true if state has a defined transition
-    @inline(__always)
     public func hasTransition(for state: String) -> Bool {
-        transitionTable[state] != nil
+        // Tier 1: Exact match
+        if exactTransitions[state] != nil {
+            return true
+        }
+
+        // Tier 2: Pattern match
+        for pattern in patterns {
+            if pattern.fromPattern.match(state: state) != nil {
+                return true
+            }
+        }
+
+        return false
     }
 
     /// Batch add transitions for performance
     /// - Parameter transitions: Dictionary of from_state -> to_state mappings
     public func addTransitions(_ transitions: [String: String?]) {
         for (from, to) in transitions {
-            transitionTable[from] = to
+            addTransition(from: from, to: to)
         }
     }
 }

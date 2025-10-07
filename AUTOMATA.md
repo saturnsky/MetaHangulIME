@@ -62,6 +62,67 @@ layout:
   c: { identifier: ".,?!", label: ".,?!", isNonKorean: true }
 ```
 
+## 패턴 매칭 (Pattern Matching)
+
+### 개요
+
+오토마타는 exact match 외에도 **패턴 매칭**을 지원합니다. 이를 통해 복잡한 중간 상태나 옛한글 입력을 효율적으로 처리할 수 있습니다.
+
+### 문법
+
+#### From 패턴: `{min:max}suffix`
+
+- `{min:max}` - prefix 길이 범위 (0 이상)
+  - `{:3}` - 0~3글자
+  - `{1:2}` - 1~2글자
+  - `{:}` - 제한 없음
+  - `{2:2}` - 정확히 2글자
+- `suffix` - 고정 문자열 (필수)
+
+**매칭 시 prefix만 캡처되며, suffix는 매칭 조건으로만 사용됩니다.**
+
+#### To 패턴: Python slice 문법
+
+- `{start:end}` - 캡처된 prefix의 슬라이스
+  - `{:}` - 전체
+  - `{:2}` - 처음 2글자
+  - `{-1}` - 마지막 1글자
+  - `{0:-1}` - 마지막 제외
+- Literal과 혼합 가능: `{-1}ㅅ`, `{:2}ㅏ{-1}`
+
+### 예시
+
+```yaml
+# 예시 1: 기본 패턴
+- { from: "{:3}ㅅ", input: "ㄱ", to: "{:}ㅅㄱ" }
+# "ㄱㄴㅅ" + ㄱ → "ㄱㄴㅅㄱ" (prefix="ㄱㄴ" 캡처, {:} = "ㄱㄴ")
+
+# 예시 2: 슬라이싱 활용
+jungseongTransitions:
+  - { jongseong: "{:3}ㅅ", remaining: "{:3}", moved: "{-1}" }
+# "ㄱㄴㅅ" → remaining="ㄱㄴ", moved="ㄴ" (마지막 글자)
+
+# 예시 3: 복합 패턴
+- { jongseong: "{:}", remaining: "{0:-1}", moved: "{-1}ㅅ" }
+# "ㄱㄴㄷ" → remaining="ㄱㄴ", moved="ㄷㅅ"
+
+# 예시 4: 범위 제한
+- { from: "{1:2}ㄹ", input: "ㄱ", to: "{:}ㄹㄱ" }
+# "ㄱㄹ" ✓ (1글자), "ㄴㄷㄹ" ✓ (2글자), "ㅁㄴㄷㄹ" ✗ (3글자, 범위 초과)
+```
+
+### 성능
+
+- **Exact match**: O(1) - 기존과 동일
+- **Pattern match**: O(p×s) - p=패턴 수(소수), s=suffix 길이(1~2)
+- Exact match가 항상 우선순위를 가지므로 대부분의 경우 O(1)
+
+### 주의사항
+
+1. **`{` 또는 `}` 단독 사용**: literal로 처리됨 (escape 불필요)
+2. **Empty string 처리**: remaining이 빈 문자열("")이면 nil로 변환됨
+3. **우선순위**: Exact match > Pattern match
+
 ## 오토마타 정의
 
 ### 낱자 오토마타 (choseong, jungseong, jongseong)

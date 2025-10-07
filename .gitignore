@@ -107,6 +107,7 @@ docs/.build/
 *.swp
 *.swo
 *~
+.clang-module-cache
 
 # Python (for mockup files)
 __pycache__/
