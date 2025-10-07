@@ -154,6 +154,69 @@ open class Automaton {
         displayTable[state] ?? state
     }
 
+    /// Display with partial matching - all characters (for archaic mode)
+    /// Converts all characters using greedy longest match
+    /// - Parameter state: State to display
+    /// - Returns: Display string with all characters converted
+    public func displayPartialAll(_ state: String) -> String {
+        // Fast path: exact match
+        if let exact = displayTable[state] {
+            return exact
+        }
+
+        // Partial matching: greedy longest match for all characters
+        var result = ""
+        var remaining = state
+
+        while !remaining.isEmpty {
+            var matched = false
+
+            // Try longest match first
+            for len in stride(from: remaining.count, through: 1, by: -1) {
+                let prefix = String(remaining.prefix(len))
+                if let display = displayTable[prefix] {
+                    result += display
+                    remaining = String(remaining.dropFirst(len))
+                    matched = true
+                    break
+                }
+            }
+
+            if !matched {
+                // No match found: keep first character as-is
+                result += String(remaining.prefix(1))
+                remaining = String(remaining.dropFirst(1))
+            }
+        }
+
+        return result
+    }
+
+    /// Display with partial matching - first match only (for modern modes)
+    /// Returns the first longest match and remaining state
+    /// - Parameter state: State to display
+    /// - Returns: Tuple of (display string, remaining state)
+    public func displayFirstMatch(_ state: String) -> (display: String, remainingState: String) {
+        // Fast path: exact match
+        if let exact = displayTable[state] {
+            return (exact, "")
+        }
+
+        // Find first longest match
+        for len in stride(from: state.count, through: 1, by: -1) {
+            let prefix = String(state.prefix(len))
+            if let display = displayTable[prefix] {
+                let remaining = String(state.dropFirst(len))
+                return (display, remaining)
+            }
+        }
+
+        // No match: return first character as-is
+        let first = String(state.prefix(1))
+        let remaining = String(state.dropFirst(1))
+        return (first, remaining)
+    }
+
     /// Check if a state exists in this automaton
     /// - Parameter state: State to check
     /// - Returns: true if state exists

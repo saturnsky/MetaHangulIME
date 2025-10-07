@@ -53,18 +53,25 @@ public final class DisplayBuilder {
 
     /// 현대 한글로 조합 가능한 음절은 현대 한글로, 아닌 음절은 옛한글로 표시하는 메서드
     private func buildArchaicDisplay(_ state: SyllableState) -> String {
-        let cho = state.choseongState.map { choseongAutomaton.display($0) } ?? ""
-        let jung = state.jungseongState.map { jungseongAutomaton.display($0) } ?? ""
-        let jong = state.jongseongState.map { jongseongAutomaton.display($0) } ?? ""
+        // displayPartialAll로 모든 글자를 Hangul Jamo로 변환
+        let cho = state.choseongState.map { choseongAutomaton.displayPartialAll($0) } ?? ""
+        let jung = state.jungseongState.map { jungseongAutomaton.displayPartialAll($0) } ?? ""
+        let jong = state.jongseongState.map { jongseongAutomaton.displayPartialAll($0) } ?? ""
 
         let (composed, remaining) = tryComposeSyllable(cho: cho, jung: jung, jong: jong)
 
-        // 모든 자모가 조합된 경우(남은 상태 없음) 조합된 결과 반환
-        // 그렇지 않으면 NFD로 표시
-        if remaining == nil {
-            return composed ?? ""
+        if let composedChar = composed {
+            // 부분 조합 성공: composed + remaining(NFD)
+            var result = composedChar
+            if let r = remaining {
+                if let rCho = r.remainingChoseong { result += rCho }
+                if let rJung = r.remainingJungseong { result += rJung }
+                if let rJong = r.remainingJongseong { result += rJong }
+            }
+            return result
         } else {
-            return concatenateJamoDisplays(state)
+            // 조합 불가능 (중성 없음 등): 전체 NFD
+            return cho + jung + jong
         }
     }
 
@@ -73,26 +80,81 @@ public final class DisplayBuilder {
         guard state.hasJamo else { return "" }
 
         var result = ""
-        var cho = state.choseongState.map { choseongAutomaton.display($0) } ?? ""
-        var jung = state.jungseongState.map { jungseongAutomaton.display($0) } ?? ""
-        var jong = state.jongseongState.map { jongseongAutomaton.display($0) } ?? ""
-        let (composed, remaining) = tryComposeSyllable(cho: cho, jung: jung, jong: jong)
+        var choState = state.choseongState ?? ""
+        var jungState = state.jungseongState ?? ""
+        var jongState = state.jongseongState ?? ""
 
-        if remaining == nil {
-            // 모든 자모가 조합된 경우(남은 상태 없음) 조합된 결과 반환
-            return composed ?? ""
-        }
-        cho = remaining?.remainingChoseong ?? ""
-        jung = remaining?.remainingJungseong ?? ""
-        jong = remaining?.remainingJongseong ?? ""
-        result += composed ?? ""
+        // Process each jamo one by one using displayFirstMatch
+        while !choState.isEmpty || !jungState.isEmpty || !jongState.isEmpty {
+            // Get first match for each position
+            var choDisplay = ""
+            if !choState.isEmpty {
+                let (display, remaining) = choseongAutomaton.displayFirstMatch(choState)
+                choDisplay = display
+                choState = remaining
+            }
 
-        while !cho.isEmpty || !jung.isEmpty || !jong.isEmpty {
-            let compatibilityResult = HangulComposer.buildCompatibilityResult(cho: cho, jung: jung, jong: jong)
-            result += compatibilityResult.composed ?? ""
-            cho = compatibilityResult.remaining?.remainingChoseong ?? ""
-            jung = compatibilityResult.remaining?.remainingJungseong ?? ""
-            jong = compatibilityResult.remaining?.remainingJongseong ?? ""
+            var jungDisplay = ""
+            if !jungState.isEmpty {
+                let (display, remaining) = jungseongAutomaton.displayFirstMatch(jungState)
+                jungDisplay = display
+                jungState = remaining
+            }
+
+            var jongDisplay = ""
+            if !jongState.isEmpty {
+                let (display, remaining) = jongseongAutomaton.displayFirstMatch(jongState)
+                jongDisplay = display
+                jongState = remaining
+            }
+
+            // Try to compose syllable
+            let (composed, remaining) = tryComposeSyllable(
+                cho: choDisplay,
+                jung: jungDisplay,
+                jong: jongDisplay
+            )
+
+            if let composedChar = composed {
+                // Composition succeeded (fully or partially)
+                result += composedChar
+
+                // Process remaining from tryComposeSyllable (if any)
+                if remaining != nil {
+                    var cho = remaining?.remainingChoseong ?? ""
+                    var jung = remaining?.remainingJungseong ?? ""
+                    var jong = remaining?.remainingJongseong ?? ""
+
+                    while !cho.isEmpty || !jung.isEmpty || !jong.isEmpty {
+                        let compatResult = HangulComposer.buildCompatibilityResult(
+                            cho: cho,
+                            jung: jung,
+                            jong: jong
+                        )
+                        result += compatResult.composed ?? ""
+                        cho = compatResult.remaining?.remainingChoseong ?? ""
+                        jung = compatResult.remaining?.remainingJungseong ?? ""
+                        jong = compatResult.remaining?.remainingJongseong ?? ""
+                    }
+                }
+            } else {
+                // Composition failed - convert to compatibility jamo
+                var cho = choDisplay
+                var jung = jungDisplay
+                var jong = jongDisplay
+
+                while !cho.isEmpty || !jung.isEmpty || !jong.isEmpty {
+                    let compatResult = HangulComposer.buildCompatibilityResult(
+                        cho: cho,
+                        jung: jung,
+                        jong: jong
+                    )
+                    result += compatResult.composed ?? ""
+                    cho = compatResult.remaining?.remainingChoseong ?? ""
+                    jung = compatResult.remaining?.remainingJungseong ?? ""
+                    jong = compatResult.remaining?.remainingJongseong ?? ""
+                }
+            }
         }
 
         return result
@@ -102,9 +164,16 @@ public final class DisplayBuilder {
     private func buildPartialDisplay(_ state: SyllableState) -> String {
         guard state.hasJamo else { return "" }
 
-        let cho = state.choseongState.map { choseongAutomaton.display($0) } ?? ""
-        let jung = state.jungseongState.map { jungseongAutomaton.display($0) } ?? ""
-        let jong = state.jongseongState.map { jongseongAutomaton.display($0) } ?? ""
+        // Get first match for each position (remaining is ignored)
+        let cho = state.choseongState.map {
+            choseongAutomaton.displayFirstMatch($0).display
+        } ?? ""
+        let jung = state.jungseongState.map {
+            jungseongAutomaton.displayFirstMatch($0).display
+        } ?? ""
+        let jong = state.jongseongState.map {
+            jongseongAutomaton.displayFirstMatch($0).display
+        } ?? ""
 
         let (composed, _) = tryComposeSyllable(cho: cho, jung: jung, jong: jong)
         return composed ?? ""

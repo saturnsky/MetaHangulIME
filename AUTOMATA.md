@@ -322,6 +322,58 @@ automata:
 - ㅍ: `\u11C1` (ᇁ)
 - ㅎ: `\u11C2` (ᇂ)
 
+## Display Partial Matching
+
+Display 테이블은 자동으로 **partial matching**을 지원합니다. 이는 복합 자모 오토마타의 난이도를 낮추는 것이 목적입니다.
+
+### 동작 방식
+
+State에 등록되지 않은 긴 문자열도 자동으로 분해되어 표시됩니다:
+
+```yaml
+jongseong:
+  display:
+    "ㄴ": "\u11AB"  # ᆫ
+    "ㅇ": "\u11BC"  # ᆼ
+    # "ㄴㅇ"는 명시적으로 정의되지 않았지만 자동으로 처리됨
+```
+
+**State: `"ㄴㅇ"`일 때:**
+- `archaic` 모드: 모든 글자를 Hangul Jamo로 변환 → `"\u11AB\u11BC"` (ᆫᆼ)
+- `modernMultiple`/`modernPartial` 모드: 첫 매치만 변환 후 나머지는 루프 처리 → 각각 별도로 조합
+
+### DisplayMode별 처리 차이
+
+**예시: State `{ choseong: "ㅇ", jungseong: "ㅐ", jongseong: "ㄴㅇ" }`**
+
+| DisplayMode | 결과 | 설명 |
+|------------|------|------|
+| `modernPartial` | `"앤"` | 첫 종성만 사용, 나머지 무시 |
+| `modernMultiple` | `"앤ㅇ"` | 첫 종성 사용 후 나머지는 호환 자모로 표시 |
+| `archaic` | `"앤ᆼ"` | 첫 종성 사용 후 나머지는 NFD로 표시 |
+
+### 명시적 복합 자모 정의
+
+Longest match가 우선되므로, 복합 자모를 명시적으로 정의하면 분해되지 않습니다:
+
+```yaml
+jongseong:
+  display:
+    "ㄹ": "\u11AF"   # ᆯ
+    "ㄱ": "\u11A8"   # ᆨ
+    "ㄹㄱ": "\u11B0"  # ᆰ (명시적 복합 자모)
+```
+
+**State: `"ㄹㄱ"`일 때:**
+- 명시적 정의가 있으면: `"\u11B0"` (단일 복합 종성)
+- 명시적 정의가 없으면: `"\u11AF\u11A8"` (두 개의 단일 종성)
+
+### 성능 고려사항
+
+- **Exact match**: O(1) Dictionary lookup (최우선)
+- **Partial match**: O(n×m) greedy longest match (n=state 길이, m=평균 lookup)
+- 실제로는 한글 자모가 1-3자 정도이므로 성능 영향 미미
+
 ## 작성 팁
 
 1. **상태 이름**: 실제 한글 자모를 사용 (예: "ㄱ", "ㅏ")

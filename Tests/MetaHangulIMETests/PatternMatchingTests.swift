@@ -338,4 +338,32 @@ final class PatternMatchingTests: XCTestCase {
         XCTAssertEqual(pattern.apply(captured: ""), "")
         XCTAssertEqual(pattern.apply(captured: "ㄱ"), "ㄱ")
     }
+
+    func testDokkaebiEmptyRemainingToNil() {
+        let dokkaebibul = DokkaebiAutomaton()
+
+        // 사용자 요청 케이스: {:1}ㄷ 패턴에서 "ㄷ" 매치 시 remaining = "" → nil
+        dokkaebibul.addChoseongTransition(
+            jongseongState: "{:1}ㄷ",
+            inputKey: "ㄷ",
+            remainingJong: "{:}",  // captured prefix 전체 = ""
+            movedCho: "ㄸ"
+        )
+
+        // "ㄷ" + "ㄷ" → prefix="" → remaining:nil (종성이 완전히 제거됨)
+        let result1 = dokkaebibul.processChoseongDokkaebi("ㄷ", inputKey: "ㄷ")
+        XCTAssertTrue(result1.shouldSplit)
+        XCTAssertNil(result1.remainingJongseongState)  // ✅ empty string → nil
+        XCTAssertEqual(result1.movedChoseongState, "ㄸ")
+
+        // "ㄱㄷ" + "ㄷ" → prefix="ㄱ" → remaining:"ㄱ" (종성 일부 유지)
+        let result2 = dokkaebibul.processChoseongDokkaebi("ㄱㄷ", inputKey: "ㄷ")
+        XCTAssertTrue(result2.shouldSplit)
+        XCTAssertEqual(result2.remainingJongseongState, "ㄱ")
+        XCTAssertEqual(result2.movedChoseongState, "ㄸ")
+
+        // "ㄱㄴㄷ" → 범위 초과로 매칭 실패
+        let result3 = dokkaebibul.processChoseongDokkaebi("ㄱㄴㄷ", inputKey: "ㄷ")
+        XCTAssertFalse(result3.shouldSplit)
+    }
 }
