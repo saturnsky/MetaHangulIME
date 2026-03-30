@@ -30,6 +30,12 @@ DerivedData/
 *.perspectivev3
 !default.perspectivev3
 
+# Swift Build Artifacts
+*.d
+*.dia
+*.swiftdeps
+*.swiftmodule
+
 # Swift Package Manager
 .build/
 .swiftpm/
